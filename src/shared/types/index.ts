@@ -19,6 +19,19 @@ export interface PaymentMaker {
   updated_at: string;
 }
 
+export interface MakePaymentResponse {
+  message: string;
+  data: Omit<Payment, 'user'>;
+}
+
+export type PaymentStatusItem = {
+  value: string;
+  label: string;
+};
+export type UserStatusItem = {
+  value: UserStatus | 'all';
+  label: string;
+};
 export interface Payment {
   user: PaymentMaker;
   amount: number;

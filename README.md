@@ -1,4 +1,10 @@
-# apex-network
+# apex-network test
+
+### Some self observations in code and reasons some decisions were made
+
+-- Code not DRY
+
+-- The aim was to implement pixel perfect design and
 
 This template should help get you started developing with Vue 3 in Vite.
 

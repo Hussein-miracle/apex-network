@@ -26,7 +26,8 @@ module.exports = {
 
         'apex-content': {
           body: 'rgba(56, 58, 71, 1)',
-          secondary: 'rgba(136, 136, 138, 1)'
+          secondary: 'rgba(136, 136, 138, 1)',
+          header: 'rgba(17, 18, 22, 1)'
         },
         accent: {
           blue: {
