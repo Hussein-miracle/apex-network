@@ -21,13 +21,13 @@ const isPayingDues = ref(false)
 
 const handlePayDues = async () => {
   const { selectedPayments } = usePaymentsStore()
-  console.log({ selectedPayments })
+  // console.log({ selectedPayments })
   if (selectedPayments.length === 0) {
     return errorToast('Please select payments to make paid')
   }
   try {
     const response = await paymentsService.MakePayment(selectedPayments)
-    console.log({ response })
+    // console.log({ response })
     if (response.message === 'success') {
       successToast('Payment successful')
     }
@@ -40,7 +40,7 @@ const handlePayDues = async () => {
 }
 
 watch(tab, (newTab) => {
-  console.log(tab)
+  // console.log(tab)
   if (!!newTab && newTab !== router.currentRoute.value.path) {
     // tab.value.current = tab.value.href === router.currentRoute.value.path
     router.push(newTab)
