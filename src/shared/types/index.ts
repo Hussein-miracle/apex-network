@@ -25,7 +25,7 @@ export interface MakePaymentResponse {
 }
 
 export type PaymentStatusItem = {
-  value: PaymentStatus;
+  value: string;
   label: string;
 };
 export type UserStatusItem = {

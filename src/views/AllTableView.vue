@@ -217,7 +217,7 @@ watch([amountInput], async () => {
   const amountValue = amountInput.value
   const amountCleaned = amountValue.replace(/,/g, '')
   const amountNumber = Number(amountCleaned)
- // console.log({ amountNumber })
+  // console.log({ amountNumber })
 
   if (amountNumber >= 0) {
     allTableData.value = allTableDataCopy.value.filter((row) => {
@@ -231,8 +231,6 @@ watch([amountInput], async () => {
 watch(
   [selectedPaymentStatus, selectedUserStatus],
   async () => {
-   
-
     allTableData.value = allTableDataCopy.value.filter((row) => {
       const userStatusMatch =
         selectedUserStatus.value === 'all'
