@@ -125,7 +125,7 @@ onMounted(() => {
                       />
                       <div class="flex flex-col items-start gap-2">
                         <div class="text-base font-medium text-apex-black">
-                          {{ transaction?.user?.name }}
+                          {{}}
                         </div>
                         <div
                           class="text-base font-medium leading-6 tracking-[0.3px] text-apex-content-secondary"
@@ -159,7 +159,7 @@ onMounted(() => {
                       <div class="text-base font-medium text-apex-content-body">
                         Paid On:
                         <span class="text-base font-medium text-apex-content-body">{{
-                          convertIsoDateToFormattedDate(transaction?.payment_expected_at)
+                          convertIsoDateToFormattedDate(transaction?.payment_made_at)
                         }}</span>
                       </div>
                     </div>

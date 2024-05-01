@@ -2,6 +2,10 @@
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 
 import avatar from '@/assets/images/avatar.png'
+import { ref } from 'vue'
+import { usePaymentsStore } from './stores/payments'
+import paymentsService from './services/payments.service'
+import { errorToast, successToast } from './shared/utils'
 
 const tabs = [
   { name: 'All', href: '/', current: false },
@@ -10,10 +14,32 @@ const tabs = [
   { name: 'Overdue', href: '/overdue', current: false }
 ]
 const router = useRouter()
+
+const isPayingDues = ref(false)
+
+const handlePayDues = async () => {
+  const { selectedPayments } = usePaymentsStore()
+  console.log({ selectedPayments })
+  if (selectedPayments.length === 0) {
+    return errorToast('Please select payments to make paid')
+  }
+  try {
+    const response = await paymentsService.MakePayment(selectedPayments)
+    console.log({ response })
+    if (response.message === 'success') {
+      successToast('Payment successful')
+    }
+    // FIXME: this could easily have been handle with tanstack query,which won't require a page reload
+    window.location.reload()
+    // successToast()
+  } catch (error: any) {
+    errorToast(error.message)
+  }
+}
 </script>
 
 <template>
-  <main class="w-full h-full bg-apex-light-white min-h-screen mx-auto bg-red-500">
+  <main class="w-full h-full bg-apex-light-white min-h-screen mx-auto">
     <header class="bg-white w-full flex justify-between items-center h-24 px-24 py-2">
       <h4 class="text-apex-black font-bold text-2xl">Table Headings</h4>
 
@@ -30,8 +56,8 @@ const router = useRouter()
       </nav>
     </header>
 
-    <section class="w-full bg-yellow-300 p-24">
-      <section class="w-full flex items-center justify-between bg-red-300">
+    <section class="w-full p-24">
+      <section class="w-full flex items-center justify-between">
         <div class="flex items-center justify-start w-full">
           <div class="sm:hidden">
             <label for="tabs" class="sr-only">Select a tab</label>
@@ -68,13 +94,15 @@ const router = useRouter()
         </div>
         <button
           type="button"
-          class="rounded-xl bg-apex-green px-5 py-2 h-14 w-64 text-base font-bold text-white tracking-[0.3px] leading-6 text-center shadow-sm hover:bg-apex-green/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apex-green/90"
+          class="rounded-xl bg-apex-green px-5 py-2 h-14 w-64 text-base font-bold text-white tracking-[0.3px] leading-6 text-center shadow-sm hover:bg-apex-green/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apex-green/90 disable:opacity-50 disable:cursor-not-allowed"
+          :disabled="isPayingDues"
+          @:click="handlePayDues"
         >
           Pay Dues
         </button>
       </section>
 
-      <section class="bg-purple-500 w-full">
+      <section class="w-full">
         <RouterView />
       </section>
     </section>

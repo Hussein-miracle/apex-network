@@ -124,7 +124,7 @@ onMounted(() => {
                         @click="markItemSelected(transaction)"
                       />
                       <div class="flex flex-col items-start gap-2">
-                        <div class="text-base font-medium text-apex-black">
+                        <div class="text-base font-semibold text-apex-black">
                           {{ transaction?.user?.name }}
                         </div>
                         <div
@@ -159,7 +159,7 @@ onMounted(() => {
                       <div class="text-base font-medium text-apex-content-body">
                         Paid On:
                         <span class="text-base font-medium text-apex-content-body">{{
-                          convertIsoDateToFormattedDate(transaction?.payment_expected_at)
+                          convertIsoDateToFormattedDate(transaction?.payment_made_at)
                         }}</span>
                       </div>
                     </div>

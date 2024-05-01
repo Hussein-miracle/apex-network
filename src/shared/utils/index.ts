@@ -1,3 +1,4 @@
+import { toast } from "vue3-toastify";
 import type { Payment, PaymentStatus } from "../types";
 
 const monthNames: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -17,7 +18,19 @@ export const formatPaymentTableData = (data: Payment[]) => {
 }
 
 
-export const convertIsoDateToFormattedDate = (isoDateString: string) => {
+export const generateArray = (start: number, end: number): number[] => {
+  const array = []
+  for (let i = start; i <= end; i++) {
+    array.push(i)
+  }
+  return array
+}
+
+
+export const convertIsoDateToFormattedDate = (isoDateString: string | null): string => {
+
+  if (!isoDateString) return 'N/A';
+
   const date = new Date(isoDateString);
   // Extract the day, month, and year
   const day = date.getDate();
@@ -28,27 +41,59 @@ export const convertIsoDateToFormattedDate = (isoDateString: string) => {
   return `${day} ${monthNames[month]}, ${year}`;
 }
 
-export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: string | null): PaymentStatus => {
+export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: string | null): PaymentStatus | undefined => {
+  let status: PaymentStatus;
+
+  console.log('paymentExpectedAt', paymentExpectedAt);
+  // console.log('paymentExpectedAt', paymentExpectedAt);
+
+  console.log('paymentMadeAt', paymentMadeAt);
   const currentDate = new Date().getTime();
   const expectedDate = new Date(new Date(paymentExpectedAt).toISOString()).getTime();
   let madeDate: number | null = null;
-  if (paymentMadeAt) {
+
+  if (!!paymentMadeAt) {
     madeDate = new Date(paymentMadeAt).getTime();
   }
   // const madeDate = new Date(paymentMadeAt).getTime();
 
 
 
-  if (!!madeDate && currentDate > expectedDate) return 'overdue';
+  if ((!!madeDate && madeDate > expectedDate)) {
+    return 'overdue';
+  };
 
 
 
-  if (!paymentExpectedAt && currentDate <= expectedDate) return 'unpaid';
+  if (!madeDate && currentDate <= expectedDate) return 'unpaid';
 
-  return 'paid';
+  if (!!madeDate && madeDate <= expectedDate) return 'paid';
 }
 
 
 export const pxToRem = (val: number) => {
   return val / 16 + 'rem'
+}
+
+export const errorToast = (message: string, toastOptions: any = {}) => {
+  toast.error(message, {
+    autoClose: 5000,
+    position: 'top-right',
+    ...toastOptions
+  });
+}
+
+export const successToast = (message: string, toastOptions: any = {}) => {
+  toast.success(message, {
+    autoClose: 5000,
+    position: 'top-right',
+    ...toastOptions
+  });
+}
+export const warnToast = (message: string, toastOptions: any = {}) => {
+  toast.warn(message, {
+    autoClose: 5000,
+    position: 'top-right',
+    ...toastOptions
+  });
 }

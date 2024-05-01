@@ -1,8 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const props = defineProps({
+  checked: {
+    type: Boolean,
+    required: false
+  }
+})
+</script>
 <template>
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="10" cy="10.0003" r="10" fill="#0CAF60" />
     <path
+      class="transition-transform duration-300 ease-in-out opacity-0"
+      :class="{ 'opacity-100 delay-300': checked }"
       d="M7.12799 9.46994C6.83509 9.17705 6.36022 9.17705 6.06733 9.46994C5.77443 9.76284 5.77443 10.2377 6.06733 10.5306L7.12799 9.46994ZM9.02821 12.4308L8.49788 12.9612C8.79077 13.2541 9.26565 13.2541 9.55854 12.9612L9.02821 12.4308ZM14.4197 8.10005C14.7125 7.80715 14.7125 7.33228 14.4197 7.03939C14.1268 6.74649 13.6519 6.74649 13.359 7.03939L14.4197 8.10005ZM6.06733 10.5306L8.49788 12.9612L9.55854 11.9005L7.12799 9.46994L6.06733 10.5306ZM9.55854 12.9612L14.4197 8.10005L13.359 7.03939L8.49788 11.9005L9.55854 12.9612Z"
       fill="white"
     />

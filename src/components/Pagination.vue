@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, type PropType, computed } from 'vue'
 import {
   Listbox,
   ListboxLabel,
@@ -11,11 +11,35 @@ import {
 import IconChevronLeft from './icons/IconChevronLeft.vue'
 import IconChevronRight from './icons/IconChevronRight.vue'
 import IconChevronUpDown from './icons/IconChevronUpDown.vue'
-const perPages = ref([6, 10, 20])
-const perPageSelected = ref(6)
+
+const props = defineProps({
+  perPages: {
+    type: Array as PropType<number[]>,
+    required: false
+  },
+  perPage: {
+    type: Number as PropType<number>,
+    required: false
+  },
+  currentPage: {
+    type: Number as PropType<number>,
+    required: false
+  },
+  totalItems: {
+    type: Number as PropType<number>,
+    required: true
+  }
+})
+
+const perPages = computed(() => props.perPages ?? [1, 2, 3, 4, 5])
+const perPage = computed(() => props.perPage ?? 1)
+
+const currentPage = computed(() => props.currentPage ?? 1)
+
+const totalPages = computed(() => Math.ceil(props.totalItems / perPage.value))
 
 const changePerPage = (perPage: number) => {
-  perPageSelected.value = perPage
+  // perPage.value = perPage
 }
 </script>
 
@@ -39,7 +63,7 @@ const changePerPage = (perPage: number) => {
       <div>
         <p class="text-sm text-apex-grey flex items-center gap-1">
           <span>Show Result:</span>&nbsp;
-          <Listbox v-model="perPageSelected" v-slot="{ open }">
+          <Listbox v-model="perPage" v-slot="{ open }">
             <div
               class="relative mt-1 w-[4.25rem] border border-solid border-apex-grey-2 rounded-lg"
             >
@@ -47,7 +71,7 @@ const changePerPage = (perPage: number) => {
                 class="relative w-full cursor-pointer rounded-lg bg-white py-2 px-3 text-left focus:outline-none sm:text-sm"
               >
                 <span class="block truncate text-apex-black font-bold font-apex">{{
-                  perPageSelected
+                  perPage
                 }}</span>
                 <span
                   class="pointer-events-none absolute inset-y-0 right-0 flex items-center -translate-x-3 rotate-0 origin-center transition-transform"
