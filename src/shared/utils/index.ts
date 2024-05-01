@@ -52,6 +52,23 @@ export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMa
   const expectedDate = new Date(new Date(paymentExpectedAt).toISOString()).getTime();
   let madeDate: number | null = null;
 
+
+  // const convertDatesToPaymentStatus = (expected: string, made: string) => {
+  //   if (!expected && !made) {
+  //     return 'unpaid'
+  //   }
+  //   if (expected && !made) {
+  //     return 'overdue'
+  //   }
+  //   if (expected && made) {
+  //     return 'paid'
+  //   }
+  //   return 'unpaid'
+  // }
+
+  // return convertDatesToPaymentStatus(paymentExpectedAt, paymentMadeAt);
+
+
   if (!!paymentMadeAt) {
     madeDate = new Date(paymentMadeAt).getTime();
   }
@@ -68,6 +85,8 @@ export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMa
   if (!madeDate && currentDate <= expectedDate) return 'unpaid';
 
   if (!!madeDate && madeDate <= expectedDate) return 'paid';
+
+  return 'overdue';
 }
 
 
@@ -75,6 +94,55 @@ export const pxToRem = (val: number) => {
   return val / 16 + 'rem'
 }
 
+// NOTE: this sis a helper func to format number to money
+export const addCommaToNumber = (num: number, decimalplace: number = 2) => {
+  return num.toFixed(decimalplace).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+
+export const removeItemFromString = (str: string, item: string) => {
+  const splittedString = str.split('');
+  let removedString = '';
+
+  for (let i = 0; i < splittedString.length; i++) {
+    if (splittedString[i] !== item) {
+      removedString += splittedString[i];
+    }
+  }
+
+  return removedString;
+}
+
+export const handleDisableLettersAndMultipleDecimal = (
+  e: KeyboardEvent
+) => {
+  console.log({ e });
+  // @ts-ignore
+  const value = e.target?.value ?? '';
+  if (e.shiftKey === true) {
+    if (e.which == 9) {
+      return true;
+    }
+    e.preventDefault();
+    return false;
+  }
+  if (e.which > 57) {
+
+    if (e.which === 190 && value.includes('.')) {
+      e.preventDefault();
+      return false;
+    } else if (e.which === 190 && !value.includes('.')) {
+      return true;
+    }
+    e.preventDefault();
+    return false;
+  }
+  if (e.which == 32) {
+    e.preventDefault();
+    return false;
+  }
+  return true;
+};
 export const errorToast = (message: string, toastOptions: any = {}) => {
   toast.error(message, {
     autoClose: 5000,

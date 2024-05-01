@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { UserStatus } from '@/shared/types'
+import { pxToRem } from '@/shared/utils'
 import type { PropType } from 'vue'
 
 const props = defineProps({
@@ -12,11 +13,12 @@ const props = defineProps({
 
 <template>
   <div
-    class="flex items-center justify-center rounded-lg px-4 py-2 gap-1 w-[120px]"
+    class="flex items-center justify-center rounded-lg px-4 py-2 gap-1"
     :class="{
       'bg-apex-light-green': user_status === 'active',
       'bg-apex-light-orange': user_status === 'inactive'
     }"
+    :style="{ width: pxToRem(120) }"
   >
     <span
       :class="{

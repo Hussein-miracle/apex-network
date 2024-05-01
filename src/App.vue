@@ -2,7 +2,7 @@
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 
 import avatar from '@/assets/images/avatar.png'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { usePaymentsStore } from './stores/payments'
 import paymentsService from './services/payments.service'
 import { errorToast, successToast } from './shared/utils'
@@ -13,6 +13,8 @@ const tabs = [
   { name: 'Unpaid', href: '/unpaid', current: true },
   { name: 'Overdue', href: '/overdue', current: false }
 ]
+
+const tab = ref(tabs[0].href)
 const router = useRouter()
 
 const isPayingDues = ref(false)
@@ -36,11 +38,20 @@ const handlePayDues = async () => {
     errorToast(error.message)
   }
 }
+
+watch(tab, (newTab) => {
+  console.log(tab)
+  if (!!newTab && newTab !== router.currentRoute.value.path) {
+    // tab.value.current = tab.value.href === router.currentRoute.value.path
+    router.push(newTab)
+  }
+  // tab.current = tab.href === router.currentRoute.value.path
+})
 </script>
 
 <template>
-  <main class="w-full h-full bg-apex-light-white min-h-screen mx-auto">
-    <header class="bg-white w-full flex justify-between items-center h-24 px-24 py-2">
+  <main class="w-full h-full bg-apex-light-white min-h-screen">
+    <header class="bg-white w-full flex justify-between items-center h-24 px-12 sm:px-24 py-2">
       <h4 class="text-apex-black font-bold text-2xl">Table Headings</h4>
 
       <nav class="flex items-center gap-4 justify-between">
@@ -56,7 +67,7 @@ const handlePayDues = async () => {
       </nav>
     </header>
 
-    <section class="w-full p-24">
+    <section class="w-full p-12 sm:p-24">
       <section class="w-full flex items-center justify-between">
         <div class="flex items-center justify-start w-full">
           <div class="sm:hidden">
@@ -65,13 +76,15 @@ const handlePayDues = async () => {
             <select
               id="tabs"
               name="tabs"
-              class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-apex-green focus:outline-none focus:ring-apex-green sm:text-sm"
+              v-model="tab"
+              class="block w-full rounded-md border border-apex-grey-2 py-2 pl-3 pr-10 text-base focus:border-apex-green focus:outline-none focus:ring-apex-green sm:text-sm"
             >
-              <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">
+              <option v-for="tab in tabs" :key="tab.name" :selected="tab.current" :value="tab.href">
                 {{ tab.name }}
               </option>
             </select>
           </div>
+
           <div class="hidden sm:block w-3/5">
             <div class="border-b border-gray-200">
               <nav class="flex space-x-8" aria-label="Tabs">
@@ -108,10 +121,3 @@ const handlePayDues = async () => {
     </section>
   </main>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-</style>
