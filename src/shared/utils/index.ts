@@ -41,13 +41,13 @@ export const convertIsoDateToFormattedDate = (isoDateString: string | null): str
   return `${day} ${monthNames[month]}, ${year}`;
 }
 
-export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: string | null): PaymentStatus | undefined => {
+export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: string | null): PaymentStatus => {
   let status: PaymentStatus;
 
-  console.log('paymentExpectedAt', paymentExpectedAt);
+  // console.log('paymentExpectedAt', paymentExpectedAt);
   // console.log('paymentExpectedAt', paymentExpectedAt);
 
-  console.log('paymentMadeAt', paymentMadeAt);
+  //console.log('paymentMadeAt', paymentMadeAt);
   const currentDate = new Date().getTime();
   const expectedDate = new Date(new Date(paymentExpectedAt).toISOString()).getTime();
   let madeDate: number | null = null;
@@ -116,7 +116,7 @@ export const removeItemFromString = (str: string, item: string) => {
 export const handleDisableLettersAndMultipleDecimal = (
   e: KeyboardEvent
 ) => {
-  console.log({ e });
+  //console.log({ e });
   // @ts-ignore
   const value = e.target?.value ?? '';
   if (e.shiftKey === true) {
