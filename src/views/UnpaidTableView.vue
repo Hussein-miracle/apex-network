@@ -109,7 +109,7 @@ const fetchPaidTableData = async (
     resetFilters()
 
     paidTableData.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
-    console.log({ paidTableData: paidTableData.value })
+    //console.log({ paidTableData: paidTableData.value })
     paidTableDataCopy.value = paidTableData.value
     renderedPages.value = getPages()
   } catch (err: any) {
@@ -216,7 +216,7 @@ watch(amountInput, async () => {
   const amountValue = amountInput.value
   const amountCleaned = amountValue.replace(/,/g, '')
   const amountNumber = Number(amountCleaned)
-  console.log({ amountNumber })
+  // console.log({ amountNumber })
 
   if (amountNumber >= 0) {
     paidTableData.value = paidTableDataCopy.value.filter((row) => {
@@ -230,11 +230,6 @@ watch(amountInput, async () => {
 watch(
   [selectedPaymentStatus, selectedUserStatus],
   async () => {
-    console.log({
-      selectedPaymentStatus: selectedPaymentStatus.value,
-      selectedUserStatus: selectedUserStatus.value
-    })
-
     paidTableData.value = paidTableDataCopy.value.filter((row) => {
       const userStatusMatch =
         selectedUserStatus.value === 'all'

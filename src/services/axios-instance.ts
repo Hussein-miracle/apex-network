@@ -2,9 +2,6 @@ import { errorToast, warnToast } from "@/shared/utils";
 import axios from "axios";
 
 
-
-console.log({ VITE_APP_APEX_API_URL: import.meta.env.VITE_APP_APEX_API_URL });
-
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_APP_APEX_API_URL as string,
   headers: {
