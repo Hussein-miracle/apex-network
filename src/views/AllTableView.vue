@@ -14,17 +14,7 @@ import {
   errorToast
 } from '@/shared/utils'
 import { PAYMENT_STATUSES, USER_STATUSES } from '@/shared/constants'
-import { useToggle } from '@/shared/hooks'
-import IconFilterVue from '@/components/icons/IconFilter.vue'
-// import Pagination from '@/components/Pagination.vue'
-import IconMore from '@/components/icons/IconMore.vue'
-import IconClosePopUp from '@/components/icons/IconClosePopUp.vue'
-import PaymentStatus from '@/components/PaymentStatus.vue'
-import UserStatus from '@/components/UserStatus.vue'
-import TableRowCheck from '@/components/TableRowCheck.vue'
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
-import TableSkeleton from '@/components/TableSkeleton.vue'
-import TableFilter from '@/components/TableFilter.vue'
+import PaymentTable from '@/components/PaymentTable.vue'
 
 import {
   Listbox,
