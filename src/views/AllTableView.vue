@@ -40,9 +40,9 @@ import IconChevronUpDown from '@/components/icons/IconChevronUpDown.vue'
 import { usePaymentsStore } from '@/stores/payments'
 
 const { setSelectedPayments } = usePaymentsStore()
-const isLoadingAllTable = ref<boolean>(false)
-const allTableData = ref<Payment[]>([])
-const allTableDataCopy = shallowRef<Payment[]>([])
+const isLoadingTable = ref<boolean>(false)
+const tableData = ref<Payment[]>([])
+const tableDataCopy = shallowRef<Payment[]>([])
 const selectedPaymentStatus = ref<StatusItem['value']>(PAYMENT_STATUSES[0].value)
 const selectedUserStatus = ref<StatusItem['value']>(USER_STATUSES[0].value)
 // const selectedAmountFilter = ref(AMOUNT_FILTERS[0])
@@ -82,15 +82,15 @@ const resetFilters = async () => {
   searchInput.value = ''
 }
 
-const fetchAllTableData = async (page: number = 1, per_page: number = 6, state: State = 'all') => {
-  isLoadingAllTable.value = true
+const fetchTableData = async (page: number = 1, per_page: number = 6, state: State = 'all') => {
+  isLoadingTable.value = true
   try {
     const data = await paymentsService.GetPayments({
       page: page ?? 1,
       perPage: per_page ?? 6,
       state: state ?? 'all'
     })
-    //  console.log({ allTableDataLog: data })
+    //  console.log({ tableDataLog: data })
     hasNextPage.value = !!data.next_page_url
     hasPrevPage.value = !!data.prev_page_url
     total.value = data.total
@@ -100,10 +100,10 @@ const fetchAllTableData = async (page: number = 1, per_page: number = 6, state: 
     // console.log({ totalPages: totalPages.value })
 
     resetFilters()
-    allTableData.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
-    allTableDataCopy.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
+    tableData.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
+    tableDataCopy.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
     // console.log({ total: total.value })
-    // console.log({ allTableData: allTableData.value })
+    // console.log({ tableData: tableData.value })
 
     // console.log({ renderedPages: renderedPages.value })
     renderedPages.value = getPages()
@@ -111,7 +111,7 @@ const fetchAllTableData = async (page: number = 1, per_page: number = 6, state: 
     console.error(err)
     errorToast(err?.message ?? 'An error occurred while fetching payments data')
   } finally {
-    isLoadingAllTable.value = false
+    isLoadingTable.value = false
   }
 }
 
@@ -121,30 +121,30 @@ const fetchAllTableData = async (page: number = 1, per_page: number = 6, state: 
 
 const handleBreakpoint = async () => {
   currentPage.value += Math.ceil(maxPagesShown.value / 2) - 1
-  await fetchAllTableData(currentPage.value, perPage.value)
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const handleSelectedPage = async (page: number) => {
   currentPage.value = page
-  await fetchAllTableData(currentPage.value, perPage.value)
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const handleNextPage = async () => {
   if (currentPage.value >= totalPages.value) return
   currentPage.value += 1
-  await fetchAllTableData(currentPage.value, perPage.value)
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const handlePrevPage = async () => {
   if (currentPage.value <= 1) return
   currentPage.value -= 1
-  await fetchAllTableData(currentPage.value, perPage.value)
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const markItemSelected = (item: Payment) => {
   const updatedItem = { ...item, _selected: !item._selected }
   // console.log({ item })
-  const updatedTableData = allTableData.value.map((tableItem) => {
+  const updatedTableData = tableData.value.map((tableItem) => {
     if (tableItem.id === updatedItem.id) {
       return updatedItem
     }
@@ -159,13 +159,13 @@ const markItemSelected = (item: Payment) => {
 
   setSelectedPayments(marked)
 
-  allTableData.value = updatedTableData
+  tableData.value = updatedTableData
 }
 
 const handlePaymentStatusChange = (payment_status: string) => {
   selectedPaymentStatus.value = payment_status
 
-  allTableData.value = allTableDataCopy.value.filter((row) => {
+  tableData.value = tableDataCopy.value.filter((row) => {
     const paymentStatusMatch =
       selectedPaymentStatus.value === 'all'
         ? true
@@ -177,7 +177,7 @@ const handlePaymentStatusChange = (payment_status: string) => {
 const handleUserStatusChange = (user_status: string) => {
   selectedUserStatus.value = user_status
 
-  allTableData.value = allTableDataCopy.value.filter((row) => {
+  tableData.value = tableDataCopy.value.filter((row) => {
     const userStatusMatch =
       selectedUserStatus.value === 'all'
         ? true
@@ -194,11 +194,11 @@ const handleAmountInput = (amount_input: string) => {
   const amountNumber = Number(amountCleaned)
 
   if (amountNumber >= 0) {
-    allTableData.value = allTableDataCopy.value.filter((row) => {
+    tableData.value = tableDataCopy.value.filter((row) => {
       return row.amount.toString().startsWith(amountCleaned) || row.amount >= amountNumber
     })
   } else {
-    allTableData.value = allTableDataCopy.value
+    tableData.value = tableDataCopy.value
   }
 }
 
@@ -207,23 +207,23 @@ const handleSearchInput = (search_input: string) => {
   searchInput.value = search_input
 
   if (!!search_input) {
-    allTableData.value = allTableDataCopy.value.filter((row) => {
+    tableData.value = tableDataCopy.value.filter((row) => {
       return (
         row.user.name.toLowerCase().includes(search_input.toLowerCase()) ||
         row.user.email.toLowerCase().includes(search_input.toLowerCase())
       )
     })
   } else {
-    allTableData.value = allTableDataCopy.value
+    tableData.value = tableDataCopy.value
   }
 }
 
 onMounted(() => {
-  fetchAllTableData()
+  fetchTableData()
 })
 
 watch(perPage, async (newPerPage: number) => {
-  await fetchAllTableData(currentPage.value, newPerPage)
+  await fetchTableData(currentPage.value, newPerPage)
 })
 </script>
 
@@ -240,191 +240,17 @@ watch(perPage, async (newPerPage: number) => {
       @on_name_input="handleSearchInput"
     />
 
-    <section class="my-4 flow-root">
-      <div class="overflow-auto">
-        <div class="inline-block min-w-full py-2 align-middle">
-          <table class="min-w-full divide-y divide-apex-grey-2 border-y border-y-apex-grey-2">
-            <thead>
-              <tr class="">
-                <th
-                  scope="col"
-                  class="py-6 pl-16 pr-3 text-left text-base font-medium text-apex-table-header"
-                >
-                  Name
-                </th>
-                <th
-                  scope="col"
-                  class="px-3 py-6 text-left text-base font-medium text-apex-table-header"
-                >
-                  User&nbsp;Status
-                </th>
-                <th
-                  scope="col"
-                  class="px-3 py-6 text-left text-base font-medium text-apex-table-header"
-                >
-                  Payment&nbsp;Status
-                </th>
-                <th
-                  scope="col"
-                  class="px-3 py-6 text-left text-base font-medium text-apex-table-header"
-                >
-                  Amount
-                </th>
-                <th scope="col" class="relative py-6 pl-3 pr-8">
-                  <span class="sr-only">Action</span>
-                </th>
-              </tr>
-            </thead>
-            <TableSkeleton v-if="isLoadingAllTable" />
-            <tbody
-              class="divide-y divide-apex-grey-2"
-              v-else-if="!isLoadingAllTable && !!allTableData"
-            >
-              <template v-if="allTableData.length > 0">
-                <tr
-                  v-for="transaction in allTableData"
-                  :key="transaction.id"
-                  class="hover:bg-apex-table-highlight"
-                >
-                  <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900">
-                    <div class="flex items-center gap-6">
-                      <TableRowCheck
-                        :checked="transaction._selected"
-                        @click="markItemSelected(transaction)"
-                      />
-                      <div class="flex flex-col items-start gap-2">
-                        <div class="text-base font-semibold text-apex-black">
-                          {{ transaction?.user?.name }}
-                        </div>
-                        <div
-                          class="text-base font-medium leading-6 tracking-[0.3px] text-apex-content-secondary"
-                        >
-                          {{ transaction?.user?.email }}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-2 text-sm">
-                    <div class="flex flex-col gap-2 items-start">
-                      <UserStatus :user_status="transaction?.user?.status" />
-                      <div class="text-base font-medium text-apex-content-body">
-                        Last Login:
-                        <span class="text-base font-medium text-apex-content-body">{{
-                          convertIsoDateToFormattedDate(transaction?.user?.last_login_at)
-                        }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-2 text-sm">
-                    <div class="flex flex-col gap-2 items-start">
-                      <PaymentStatus
-                        :payment_status="
-                          convertDatesToPaymentStatus(
-                            transaction.payment_expected_at,
-                            transaction.payment_made_at
-                          )
-                        "
-                      />
-                      <div class="text-base font-medium text-apex-content-body">
-                        Paid On:
-                        <span class="text-base font-medium text-apex-content-body">{{
-                          convertIsoDateToFormattedDate(transaction?.payment_made_at)
-                        }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-2">
-                    <div class="flex flex-col gap-2 items-start">
-                      <div
-                        class="text-apex-black font-semibold font-apex leading-6 tracking-[0.3px]"
-                      >
-                        ${{ addThousandSeparator((transaction?.amount ?? 0)?.toString(), ',') }}
-                      </div>
-                      <div class="uppercase text-apex-content-secondary text-base font-medium">
-                        {{ transaction?.currency }}
-                      </div>
-                    </div>
-                  </td>
-                  <td
-                    class="relative whitespace-nowrap py-2 pl-3 pr-8 text-right text-sm font-medium"
-                  >
-                    <Popover v-slot="{ open }" class="relative" id="{{ transaction?.id }}">
-                      <PopoverButton
-                        class="group inline-flex items-center rounded-md text-base outline-none focus:outline-none"
-                      >
-                        <div class="cursor-pointer">
-                          <IconMore />
-                        </div>
-                      </PopoverButton>
-
-                      <transition
-                        enter-active-class="transition duration-200 ease-out"
-                        enter-from-class="translate-y-1 opacity-0"
-                        enter-to-class="translate-y-0 opacity-100"
-                        leave-active-class="transition duration-150 ease-in"
-                        leave-from-class="translate-y-0 opacity-100"
-                        leave-to-class="translate-y-1 opacity-0"
-                      >
-                        <PopoverPanel class="absolute right-2 z-20 w-fit" v-slot="{ close }">
-                          <div
-                            class="rounded-full cursor-pointer w-5 h-5 flex items-center justify-center absolute -right-1.5 -top-1.5 z-10 transform transition-transform delay-300 ease-in-out"
-                            :class="{ 'rotate-0': open, 'rotate-180': !open }"
-                            @click="close"
-                          >
-                            <IconClosePopUp />
-                          </div>
-                          <div
-                            class="overflow-hidden rounded-md bg-white drop-shadow-lg relative flex flex-col items-center justify-between gap-2 text-start text-sm font-medium px-2 py-3"
-                            :style="{ width: pxToRem(156) }"
-                          >
-                            <div class="flex flex-col items-center text-start w-full">
-                              <div
-                                class="text-apex-content-body hover:bg-apex-light-green transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
-                              >
-                                Edit
-                              </div>
-                              <div
-                                class="text-apex-content-body hover:bg-apex-light-green transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
-                              >
-                                View&nbsp;Profile
-                              </div>
-                            </div>
-                            <div class="bg-accent-blue-50 h-[1px] w-full" />
-                            <div class="text-start w-full">
-                              <div
-                                class="text-apex-danger hover:font-semibold hover:bg-apex-black transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
-                              >
-                                Delete
-                              </div>
-                            </div>
-                          </div>
-                        </PopoverPanel>
-                      </transition>
-                    </Popover>
-                  </td>
-                </tr>
-              </template>
-              <template v-else>
-                <tr>
-                  <td
-                    class="pb-4 pt-8 px-6 text-center text-base font-semibold text-apex-content-body"
-                    colspan="5"
-                  >
-                    <div>No payments data available.</div>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+    <PaymentTable
+      :tableData="tableData"
+      :isLoadingTable="isLoadingTable"
+      :table-type="'all'"
+      :mark-item-selected="markItemSelected"
+    />
 
     <main
       class="w-full flex items-center justify-between pb-6 pt-8 pl-8 pr-4"
       v-if="
-        (!isLoadingAllTable && allTableData.length > 0) ||
-        (!isLoadingAllTable && currentPage <= totalPages)
+        (!isLoadingTable && tableData.length > 0) || (!isLoadingTable && currentPage <= totalPages)
       "
     >
       <!-- <Pagination :total-items="total" /> -->

@@ -19,8 +19,8 @@ const tableData = ref<{ id: number }[]>([
         <div class="flex items-center gap-6">
           <div class="w-5 h-5 animate-pulse bg-gray-200 rounded-full"></div>
           <div class="flex flex-col items-start gap-2">
+            <div class="w-24 h-5 animate-pulse bg-gray-200 rounded-md">&nbsp;</div>
             <div class="w-28 h-4 animate-pulse bg-gray-200 rounded-md">&nbsp;</div>
-            <div class="w-24 h-4 animate-pulse bg-gray-200 rounded-md">&nbsp;</div>
           </div>
         </div>
       </td>

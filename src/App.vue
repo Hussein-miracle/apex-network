@@ -112,7 +112,7 @@ watch(tab, (newTab) => {
         </div>
         <button
           type="button"
-          class="rounded-xl bg-apex-green px-5 py-2 h-14 w-64 text-base font-bold text-white tracking-[0.3px] leading-6 text-center shadow-sm hover:bg-apex-green/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apex-green/90 disable:opacity-50 disable:cursor-not-allowed flex items-center justify-center"
+          class="rounded-xl bg-apex-green px-5 py-2 h-14 w-64 text-base font-bold text-white tracking-[0.3px] leading-6 text-center shadow-sm hover:bg-apex-green/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apex-green/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           :disabled="isPayingDues"
           @:click="handlePayDues"
         >
