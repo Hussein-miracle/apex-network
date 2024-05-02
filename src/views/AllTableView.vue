@@ -176,7 +176,7 @@ onMounted(() => {
       <Pagination
         :total-items="totalItems"
         :per-pages="[6, 10, 20]"
-        :per-page="6"
+        :per-page="perPage"
         :currentPage="currentPage"
         @per_page_change="handlePerPage"
         @current_page_change="handleSelectedPage"

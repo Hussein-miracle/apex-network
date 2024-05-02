@@ -49,6 +49,10 @@ const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
 const selectedPage = ref<number>(props.currentPage)
 const selectedPerPage = ref<number>(props.perPage)
 
+const page = computed(() => {
+  return selectedPage.value
+})
+
 const hasNextPage = computed(() => {
   return selectedPage.value !== totalPages.value
 })
@@ -93,6 +97,8 @@ const handlePrevPage = () => {
 }
 
 watch(selectedPerPage, (newValue: number) => {
+  // console.log({ selectedPerPage: selectedPerPage.value })
+  // selectedPerPage.value = newValue
   emit(PAGINATION_EMITS.ON_PER_PAGE_CHANGE, newValue)
 })
 </script>
@@ -129,7 +135,7 @@ watch(selectedPerPage, (newValue: number) => {
                 class="relative w-full cursor-pointer rounded-lg bg-white py-2 px-3 text-left focus:outline-none sm:text-sm"
               >
                 <span class="block truncate text-apex-black font-bold font-apex">{{
-                  selectedPerPage
+                  $props.perPage
                 }}</span>
                 <span
                   class="pointer-events-none absolute inset-y-0 right-0 flex items-center -translate-x-3 rotate-0 origin-center transition-transform"
@@ -149,9 +155,9 @@ watch(selectedPerPage, (newValue: number) => {
                 >
                   <ListboxOption
                     v-slot="{ active, selected }"
-                    v-for="page in props.perPages"
-                    :key="page"
-                    :value="page"
+                    v-for="p in props.perPages"
+                    :key="p"
+                    :value="p"
                     as="template"
                   >
                     <li
@@ -161,7 +167,7 @@ watch(selectedPerPage, (newValue: number) => {
                       ]"
                     >
                       <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
-                        page
+                        p
                       }}</span>
                     </li>
                   </ListboxOption>
