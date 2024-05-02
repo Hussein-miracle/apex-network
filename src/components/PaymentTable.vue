@@ -32,6 +32,10 @@ const props = defineProps({
   tableType: {
     type: String as PropType<State>,
     required: false
+  },
+  currencySymbol: {
+    type: String,
+    required: false
   }
 })
 </script>
@@ -111,14 +115,7 @@ const props = defineProps({
                 </td>
                 <td class="whitespace-nowrap px-3 py-2 text-sm">
                   <div class="flex flex-col gap-2 items-start">
-                    <PaymentStatus
-                      :payment_status="
-                        convertDatesToPaymentStatus(
-                          transaction.payment_expected_at,
-                          transaction.payment_made_at
-                        )
-                      "
-                    />
+                    <PaymentStatus :payment_status="transaction._payment_status" />
                     <div class="text-base font-medium text-apex-content-body">
                       Paid On:
                       <span class="text-base font-medium text-apex-content-body">{{
@@ -130,7 +127,8 @@ const props = defineProps({
                 <td class="whitespace-nowrap px-3 py-2">
                   <div class="flex flex-col gap-2 items-start">
                     <div class="text-apex-black font-semibold font-apex leading-6 tracking-[0.3px]">
-                      ${{ addThousandSeparator((transaction?.amount ?? 0)?.toString(), ',') }}
+                      {{ props.currencySymbol ?? '$'
+                      }}{{ addThousandSeparator((transaction?.amount ?? 0)?.toString(), ',') }}
                     </div>
                     <div class="uppercase text-apex-content-secondary text-base font-medium">
                       {{ transaction?.currency }}
@@ -202,7 +200,10 @@ const props = defineProps({
                   class="pb-4 pt-8 px-6 text-center text-base font-semibold text-apex-content-body"
                   colspan="5"
                 >
-                  <div>No {{ tableType ?? '' }} payments data available.</div>
+                  <div>
+                    No {{ !!tableType && tableType !== 'all' ? tableType : '' }} payments data
+                    available.
+                  </div>
                 </td>
               </tr>
             </template>

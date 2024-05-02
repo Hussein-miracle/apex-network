@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type PropType, computed } from 'vue'
+import { ref, type PropType, computed, toRef, watch } from 'vue'
 import {
   Listbox,
   ListboxLabel,
@@ -7,10 +7,11 @@ import {
   ListboxOptions,
   ListboxOption
 } from '@headlessui/vue'
-
+import { PAGINATION_EMITS } from '@/shared/constants'
 import IconChevronLeft from './icons/IconChevronLeft.vue'
 import IconChevronRight from './icons/IconChevronRight.vue'
 import IconChevronUpDown from './icons/IconChevronUpDown.vue'
+import { generateArray, generatePages } from '@/shared/utils'
 
 const props = defineProps({
   perPages: {
@@ -37,43 +38,68 @@ const props = defineProps({
     required: false,
     default: 5
   },
-  onPageChange: {
-    type: Function as PropType<(page: number) => Promise<void>>,
-    required: true
-  },
   onPerPageChange: {
     type: Function as PropType<(perPage: number) => void>,
-    required: true
-  },
-  hasNextPage: {
-    type: Boolean as PropType<boolean>,
-    required: false,
-    default: false
-  },
-  hasPrevPage: {
-    type: Boolean as PropType<boolean>,
-    required: false,
-    default: false
-  },
-  renderedPages: {
-    type: Array as PropType<number[]>,
-    required: true
-  },
-  handleNextPage: {
-    type: Function as PropType<() => void>,
-    required: true
-  },
-  handlePrevPage: {
-    type: Function as PropType<() => void>,
-    required: true
+    required: !true,
+    default: (p: number) => {}
   },
   handleBreakpoint: {
     type: Function as PropType<() => void>,
-    required: true
+    required: !true
   }
 })
 
 const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
+
+const selectedPage = ref<number>(props.currentPage)
+const selectedPerPage = ref<number>(props.perPage)
+
+const hasNextPage = computed(() => {
+  return selectedPage.value !== totalPages.value
+})
+const hasPrevPage = computed(() => {
+  return selectedPage.value !== 1
+})
+
+const renderedPages = computed(() => {
+  return generatePages(selectedPage.value, props.maxPagesShown, totalPages.value)
+})
+// ---> Events ---- //
+const emit = defineEmits([
+  PAGINATION_EMITS.ON_CURRENT_PAGE_CHANGE,
+  PAGINATION_EMITS.ON_PER_PAGE_CHANGE
+])
+
+const handlePageClick = (page: number) => {
+  if (page !== selectedPage.value) {
+    selectedPage.value = page
+  }
+
+  emit(PAGINATION_EMITS.ON_CURRENT_PAGE_CHANGE, page)
+}
+
+const handleNextPage = () => {
+  if (selectedPage.value < totalPages.value) {
+    selectedPage.value += 1
+    emit(PAGINATION_EMITS.ON_CURRENT_PAGE_CHANGE, selectedPage.value)
+  }
+}
+
+const handleBreakpoint = () => {
+  selectedPage.value = selectedPage.value + Math.ceil(props.maxPagesShown / 2)
+  emit(PAGINATION_EMITS.ON_CURRENT_PAGE_CHANGE, selectedPage.value)
+}
+
+const handlePrevPage = () => {
+  if (selectedPage.value < totalPages.value && selectedPage.value > 1) {
+    selectedPage.value -= 1
+    emit(PAGINATION_EMITS.ON_CURRENT_PAGE_CHANGE, selectedPage.value)
+  }
+}
+
+watch(selectedPerPage, (newValue: number) => {
+  emit(PAGINATION_EMITS.ON_PER_PAGE_CHANGE, newValue)
+})
 </script>
 
 <template>
@@ -81,7 +107,7 @@ const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
     <div class="flex flex-1 justify-between sm:hidden">
       <button
         type="button"
-        :disabled="!hasPrevPage && currentPage === totalPages"
+        :disabled="!hasPrevPage && selectedPage === totalPages"
         @click="handlePrevPage"
         class="relative inline-flex items-center rounded-md px-2 py-2 text-gray-400 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-apex-light-green hover:text-apex-green border-apex-grey-2 border"
       >
@@ -100,7 +126,7 @@ const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
       <div>
         <p class="text-sm text-apex-grey flex items-center gap-1">
           <span>Show Result:</span>&nbsp;
-          <Listbox v-slot="{ open }" v-model="perPage">
+          <Listbox v-slot="{ open }" v-model="selectedPerPage">
             <div
               class="relative mt-1 w-[4.25rem] border border-solid border-apex-grey-2 rounded-lg"
             >
@@ -108,7 +134,7 @@ const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
                 class="relative w-full cursor-pointer rounded-lg bg-white py-2 px-3 text-left focus:outline-none sm:text-sm"
               >
                 <span class="block truncate text-apex-black font-bold font-apex">{{
-                  props.perPage
+                  selectedPerPage
                 }}</span>
                 <span
                   class="pointer-events-none absolute inset-y-0 right-0 flex items-center -translate-x-3 rotate-0 origin-center transition-transform"
@@ -142,12 +168,6 @@ const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
                       <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
                         page
                       }}</span>
-                      <!-- <span
-                      v-if="selected"
-                      class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600"
-                    >
-                      <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                    </span> -->
                     </li>
                   </ListboxOption>
                 </ListboxOptions>
@@ -160,22 +180,20 @@ const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
         <nav class="isolate inline-flex" aria-label="Pagination">
           <button
             type="button"
-            :disabled="!hasPrevPage && currentPage === totalPages"
+            :disabled="!hasPrevPage"
             @click="handlePrevPage"
             class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 focus:z-20 focus:outline-offset-0 w-10 h-10 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span class="sr-only">Previous</span>
             <IconChevronLeft class="h-5 w-5" aria-hidden="true" />
           </button>
-          <!-- Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900   focus:outline-offset-0" -->
-
           <button
             v-for="page in renderedPages.slice(0, 4)"
             type="button"
             aria-current="page"
             class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-semibold hover:bg-apex-light-green hover:text-apex-green w-10 h-10 rounded-xl"
-            :class="{ 'bg-apex-light-green text-apex-green ': page === currentPage }"
-            @click="props.onPageChange(page)"
+            :class="{ 'bg-apex-light-green text-apex-green ': page === selectedPage }"
+            @click="handlePageClick(page)"
           >
             {{ page }}
           </button>
@@ -191,9 +209,9 @@ const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
             class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-semibold hover:bg-apex-light-green hover:text-apex-green w-10 h-10 rounded-xl"
             :class="{
               'bg-apex-light-green text-apex-green ':
-                renderedPages[renderedPages.length - 1] === currentPage
+                renderedPages[renderedPages.length - 1] === selectedPage
             }"
-            @click="props.onPageChange(renderedPages[renderedPages.length - 1])"
+            @click="handlePageClick(renderedPages[renderedPages.length - 1])"
           >
             {{ renderedPages[renderedPages.length - 1] }}
           </button>

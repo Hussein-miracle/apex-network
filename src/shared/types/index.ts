@@ -49,6 +49,7 @@ export interface Payment {
 
   // client-side modification properties
   _selected?: boolean;
+  _payment_status?: PaymentStatus;
 }
 
 export interface PaymentPaginationLink {
