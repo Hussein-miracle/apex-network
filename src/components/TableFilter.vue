@@ -6,7 +6,7 @@ import {
   handleDisableLettersAndMultipleDecimal,
   removeItemFromString
 } from '@/shared/utils'
-import type { PaymentStatusItem, UserStatusItem } from '@/shared/types'
+import type { PaymentStatusItem, StatusItem, UserStatusItem } from '@/shared/types'
 import {
   Listbox,
   ListboxLabel,
@@ -21,11 +21,11 @@ import { ref, type PropType, computed } from 'vue'
 const { value: showFilters, toggle: toggleFilters } = useToggle()
 const props = defineProps({
   selectedPaymentStatus: {
-    type: String as PropType<PaymentStatusItem['value']>,
+    type: String as PropType<StatusItem['value']>,
     default: PAYMENT_STATUSES[0].value
   },
   selectedUserStatus: {
-    type: String as PropType<UserStatusItem['value']>,
+    type: String as PropType<StatusItem['value']>,
     default: USER_STATUSES[0].value
   },
   amountInput: {
