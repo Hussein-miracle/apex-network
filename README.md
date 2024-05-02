@@ -1,10 +1,10 @@
 # apex-network test
 
-### Some self observations in code and reasons some decisions were made
+## NOTE TO REVIEWER
 
--- Code not DRY
+### Some self observations in code.
 
--- The aim was to implement pixel perfect design and
+- The utility function converting dates to `PaymentStatus` seems a little big buggy,working for `unpaid` & `overdue` but not for paid.
 
 This template should help get you started developing with Vue 3 in Vite.
 
