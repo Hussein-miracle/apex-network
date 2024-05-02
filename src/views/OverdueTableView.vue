@@ -120,7 +120,7 @@ const handleAmountInput = (amount_input: string) => {
 }
 
 const handleSearchInput = (search_input: string) => {
-  console.log({ search_input })
+  //console.log({ search_input })
   searchInput.value = search_input
 
   if (!!search_input) {

@@ -42,7 +42,7 @@ const fetchTableData = async (page: number = 1, per_page: number = 6, state: Sta
       perPage: per_page ?? 6,
       state: state ?? 'all'
     })
-    console.log({ tableDataLog: data })
+    // console.log({ tableDataLog: data })
     hasNextPage.value = !!data.next_page_url
     hasPrevPage.value = !!data.prev_page_url
     totalItems.value = data.total
@@ -119,7 +119,7 @@ const handleAmountInput = (amount_input: string) => {
 }
 
 const handleSearchInput = (search_input: string) => {
-  console.log({ search_input })
+  // console.log({ search_input })
   searchInput.value = search_input
 
   if (!!search_input) {
