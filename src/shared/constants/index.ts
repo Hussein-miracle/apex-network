@@ -61,3 +61,9 @@ export const TABLE_FILTERS_EMITS = {
   SEARCH_INPUT_EMIT: 'on_name_input',
   USER_STATUS_EMIT: 'on_user_status_change'
 } as const;
+
+
+export const PAGINATION_EMITS = {
+  ON_CURRENT_PAGE_CHANGE: 'current_page_change',
+  ON_PER_PAGE_CHANGE: 'per_page_change'
+} as const;

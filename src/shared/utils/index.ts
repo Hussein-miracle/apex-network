@@ -8,37 +8,22 @@ export function addThousandSeparator(integer: string, separator: string) {
   return integer.replace(/(\d)(?=(?:\d{3})+\b)/gm, `$1${separator}`);
 }
 
-export const formatPaymentTableData = (data: Payment[]) => {
-  return data.map((item) => {
-    return {
-      ...item,
-      _selected: false,
-    }
-  })
-}
+export const getPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: string | null) => {
+  const currentDate = new Date().getTime();
+  const expectedDate = new Date(new Date(paymentExpectedAt).toISOString()).getTime();
+  let madeDate: number | null = null;
 
-
-export const generateArray = (start: number, end: number): number[] => {
-  const array = []
-  for (let i = start; i <= end; i++) {
-    array.push(i)
+  if (!!paymentMadeAt) {
+    madeDate = new Date(paymentMadeAt).getTime();
   }
-  return array
-}
+
+  if (currentDate > expectedDate && !!paymentMadeAt) return 'overdue';
 
 
-export const convertIsoDateToFormattedDate = (isoDateString: string | null): string => {
+  if (!(currentDate > expectedDate) && !madeDate) return 'unpaid';
 
-  if (!isoDateString) return 'N/A';
 
-  const date = new Date(isoDateString);
-  // Extract the day, month, and year
-  const day = date.getDate();
-  // Note: getMonth() returns a zero-based index, so January is 0, February is 1, etc.
-  const month = date.getMonth();
-  const year = date.getFullYear();
-  // Format the date into the desired format
-  return `${day} ${monthNames[month]}, ${year}`;
+  return 'paid'
 }
 
 export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: string | null): PaymentStatus => {
@@ -78,7 +63,7 @@ export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMa
 
   if ((!!madeDate && madeDate > expectedDate)) {
     return 'overdue';
-  };
+  }
 
 
 
@@ -88,6 +73,60 @@ export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMa
 
   return 'overdue';
 }
+
+export const formatPaymentTableData = (data: Payment[]) => {
+  return data.map((item) => {
+    return {
+      ...item,
+      _selected: false,
+      _payment_status: convertDatesToPaymentStatus(item?.payment_expected_at, item?.payment_made_at),
+      _ps: getPaymentStatus(item.payment_expected_at, item.payment_made_at),
+    }
+  })
+}
+
+export const generatePages = (current_page: number = 1, max_pages_shown: number = 10, total_pages: number = 0) => {
+
+  const difference = Math.floor(max_pages_shown / 2)
+  const evenOffset = max_pages_shown % 2 === 0 ? 1 : 0
+
+  if (current_page + difference >= total_pages) {
+    return generateArray(total_pages - max_pages_shown + 1, total_pages)
+  }
+  if (current_page - difference <= 0) {
+    return generateArray(1, max_pages_shown)
+  }
+
+  return generateArray(
+    current_page - difference + evenOffset,
+    current_page + difference
+  )
+}
+
+export const generateArray = (start: number, end: number): number[] => {
+  const array = []
+  for (let i = start; i <= end; i++) {
+    array.push(i)
+  }
+  return array
+}
+
+
+export const convertIsoDateToFormattedDate = (isoDateString: string | null): string => {
+
+  if (!isoDateString) return 'N/A';
+
+  const date = new Date(isoDateString);
+  // Extract the day, month, and year
+  const day = date.getDate();
+  // Note: getMonth() returns a zero-based index, so January is 0, February is 1, etc.
+  const month = date.getMonth();
+  const year = date.getFullYear();
+  // Format the date into the desired format
+  return `${day} ${monthNames[month]}, ${year}`;
+}
+
+
 
 
 export const pxToRem = (val: number) => {
