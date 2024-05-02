@@ -6,6 +6,7 @@ import { ref, watch } from 'vue'
 import { usePaymentsStore } from './stores/payments'
 import paymentsService from './services/payments.service'
 import { errorToast, successToast } from './shared/utils'
+import Spinner from './components/Spinner.vue'
 
 const tabs = [
   { name: 'All', href: '/', current: false },
@@ -22,11 +23,14 @@ const isPayingDues = ref(false)
 const handlePayDues = async () => {
   const { selectedPayments } = usePaymentsStore()
   // console.log({ selectedPayments })
+  isPayingDues.value = true
   if (selectedPayments.length === 0) {
+    isPayingDues.value = false
     return errorToast('Please select payments to make paid')
   }
   try {
     const response = await paymentsService.MakePayment(selectedPayments)
+    isPayingDues.value = false
     // console.log({ response })
     if (response.message === 'success') {
       successToast('Payment successful')
@@ -35,6 +39,7 @@ const handlePayDues = async () => {
     window.location.reload()
     // successToast()
   } catch (error: any) {
+    isPayingDues.value = false
     errorToast(error.message)
   }
 }
@@ -107,11 +112,12 @@ watch(tab, (newTab) => {
         </div>
         <button
           type="button"
-          class="rounded-xl bg-apex-green px-5 py-2 h-14 w-64 text-base font-bold text-white tracking-[0.3px] leading-6 text-center shadow-sm hover:bg-apex-green/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apex-green/90 disable:opacity-50 disable:cursor-not-allowed"
+          class="rounded-xl bg-apex-green px-5 py-2 h-14 w-64 text-base font-bold text-white tracking-[0.3px] leading-6 text-center shadow-sm hover:bg-apex-green/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apex-green/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           :disabled="isPayingDues"
           @:click="handlePayDues"
         >
-          Pay Dues
+          <Spinner v-if="isPayingDues" />
+          <span v-else>Pay Dues</span>
         </button>
       </section>
 
