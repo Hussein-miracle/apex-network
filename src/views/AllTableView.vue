@@ -15,6 +15,7 @@ import {
 } from '@/shared/utils'
 import { PAYMENT_STATUSES, USER_STATUSES } from '@/shared/constants'
 import PaymentTable from '@/components/PaymentTable.vue'
+import TableFilter from '@/components/TableFilter.vue'
 
 import {
   Listbox,
