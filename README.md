@@ -3,8 +3,8 @@
 ## NOTE TO REVIEWER
 
 ### Some self observations in code.
-
 - The utility function converting dates to `PaymentStatus` seems a little big buggy,working for `unpaid` & `overdue` but not for paid.
+
 
 This template should help get you started developing with Vue 3 in Vite.
 
