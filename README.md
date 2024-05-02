@@ -2,9 +2,8 @@
 
 ### Some self observations in code and reasons some decisions were made
 
--- Code not DRY
+-- Code not DRY for the pagination section,working on refactoring it into a reusable component
 
--- The aim was to implement pixel perfect design and
 
 This template should help get you started developing with Vue 3 in Vite.
 
