@@ -115,7 +115,7 @@ const props = defineProps({
                 </td>
                 <td class="whitespace-nowrap px-3 py-2 text-sm">
                   <div class="flex flex-col gap-2 items-start">
-                    <PaymentStatus :payment_status="transaction._payment_status" />
+                    <PaymentStatus :payment_status="transaction._payment_status!" />
                     <div class="text-base font-medium text-apex-content-body">
                       Paid On:
                       <span class="text-base font-medium text-apex-content-body">{{
