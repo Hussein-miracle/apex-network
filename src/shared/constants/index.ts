@@ -1,8 +1,8 @@
-import type { PaymentStatusItem, UserStatusItem } from "../types";
+import type { StatusItem } from "../types";
 
 
 
-export const PAYMENT_STATUSES: Array<PaymentStatusItem> = [
+export const PAYMENT_STATUSES: Array<StatusItem> = [
   {
     value: 'all',
     label: 'All',
@@ -39,7 +39,7 @@ export const AMOUNT_FILTERS = [
 ]
 
 
-export const USER_STATUSES: Array<UserStatusItem> = [
+export const USER_STATUSES: Array<StatusItem> = [
   {
     value: 'all',
     label: 'All',
@@ -53,3 +53,11 @@ export const USER_STATUSES: Array<UserStatusItem> = [
     label: 'Inactive',
   }
 ]
+
+
+export const TABLE_FILTERS_EMITS = {
+  PAYMENT_STATUS_EMIT: 'on_payment_status_change',
+  AMOUNT_INPUT_EMIT: 'on_amount_input',
+  SEARCH_INPUT_EMIT: 'on_name_input',
+  USER_STATUS_EMIT: 'on_user_status_change'
+} as const;

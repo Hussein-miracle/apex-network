@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, shallowRef, watch } from 'vue'
 import paymentsService from '@/services/payments.service'
-import type { Payment, PaymentStatusItem, State, UserStatusItem } from '@/shared/types'
+import type { Payment, State, StatusItem } from '@/shared/types'
 import {
   addThousandSeparator,
   convertIsoDateToFormattedDate,
@@ -9,14 +9,9 @@ import {
   pxToRem,
   formatPaymentTableData,
   generateArray,
-  handleDisableLettersAndMultipleDecimal,
-  removeItemFromString,
   errorToast
 } from '@/shared/utils'
 import { PAYMENT_STATUSES, USER_STATUSES } from '@/shared/constants'
-import { useToggle } from '@/shared/hooks'
-import IconFilterVue from '@/components/icons/IconFilter.vue'
-// import Pagination from '@/components/Pagination.vue'
 import IconMore from '@/components/icons/IconMore.vue'
 import IconClosePopUp from '@/components/icons/IconClosePopUp.vue'
 import PaymentStatus from '@/components/PaymentStatus.vue'
@@ -24,6 +19,7 @@ import UserStatus from '@/components/UserStatus.vue'
 import TableRowCheck from '@/components/TableRowCheck.vue'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
 import TableSkeleton from '@/components/TableSkeleton.vue'
+import TableFilter from '@/components/TableFilter.vue'
 
 import {
   Listbox,
@@ -40,13 +36,13 @@ import { usePaymentsStore } from '@/stores/payments'
 
 const { setSelectedPayments } = usePaymentsStore()
 
-let isLoadingPaidTable = ref<boolean>(false)
-const paidTableData = ref<Payment[]>([])
-const paidTableDataCopy = ref<Payment[]>([])
+let isLoadingTable = ref<boolean>(false)
+const tableData = ref<Payment[]>([])
+const tableDataCopy = ref<Payment[]>([])
 
-const { value: showFilters, toggle: toggleFilters } = useToggle()
-const selectedPaymentStatus = ref<PaymentStatusItem['value']>(PAYMENT_STATUSES[0].value)
-const selectedUserStatus = ref<UserStatusItem['value']>(USER_STATUSES[0].value)
+// FILTERS
+const selectedPaymentStatus = ref<StatusItem['value']>(PAYMENT_STATUSES[0].value)
+const selectedUserStatus = ref<StatusItem['value']>(USER_STATUSES[0].value)
 // const selectedAmountFilter = ref(AMOUNT_FILTERS[0])
 const amountInput = ref<string>('')
 const searchInput = ref<string>('')
@@ -68,7 +64,7 @@ const resetFilters = async () => {
   selectedUserStatus.value = USER_STATUSES[0].value
   amountInput.value = ''
   searchInput.value = ''
-  // await fetchpaidTableData(currentPage.value, perPage.value);
+  // await fetchTableData(currentPage.value, perPage.value);
 }
 
 const getPages = () => {
@@ -85,19 +81,15 @@ const getPages = () => {
   return generateArray(currentPage.value - difference + evenOffset, currentPage.value + difference)
 }
 
-const fetchPaidTableData = async (
-  page: number = 1,
-  per_page: number = 6,
-  state: State = 'unpaid'
-) => {
-  isLoadingPaidTable.value = true
+const fetchTableData = async (page: number = 1, per_page: number = 6, state: State = 'unpaid') => {
+  isLoadingTable.value = true
   try {
     const data = await paymentsService.GetPayments({
       page,
       perPage: per_page,
       state: state ?? 'unpaid'
     })
-    // console.log({ paidTableDataLog: data })
+    // console.log({ tableDataLog: data })
     hasNextPage.value = !!data.next_page_url
     hasPrevPage.value = !!data.prev_page_url
     total.value = data.total
@@ -108,68 +100,43 @@ const fetchPaidTableData = async (
 
     resetFilters()
 
-    paidTableData.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
-    //console.log({ paidTableData: paidTableData.value })
-    paidTableDataCopy.value = paidTableData.value
+    tableData.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
+    // console.log({ tableData: tableData.value })
+    tableDataCopy.value = tableData.value
     renderedPages.value = getPages()
   } catch (err: any) {
     console.error(err)
     errorToast(err?.message ?? 'An error occurred while fetching payments data')
   } finally {
-    isLoadingPaidTable.value = false
+    isLoadingTable.value = false
   }
 }
 const handleBreakpoint = async () => {
   currentPage.value += Math.ceil(maxPagesShown.value / 2) - 1
-  await fetchPaidTableData(currentPage.value, perPage.value)
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const handleSelectedPage = async (page: number) => {
   currentPage.value = page
-  await fetchPaidTableData(currentPage.value, perPage.value)
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const handleNextPage = async () => {
   if (currentPage.value >= totalPages.value) return
   currentPage.value += 1
-  await fetchPaidTableData(currentPage.value, perPage.value)
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const handlePrevPage = async () => {
   if (currentPage.value <= 1) return
   currentPage.value -= 1
-  await fetchPaidTableData(currentPage.value, perPage.value)
-}
-
-const handleAmountChange = (e: Event) => {
-  const target = e.target as HTMLInputElement
-  const value = target.value
-  // console.log({ value })
-
-  let parts = value
-  let partsString = removeItemFromString(parts, ',')
-
-  partsString = partsString.startsWith('0') ? partsString.slice(1) : partsString
-
-  const includesDecimal = partsString.includes('.')
-
-  if (includesDecimal) {
-    const partsSplit = partsString.split('.')
-    partsSplit[0] = addThousandSeparator(partsSplit[0], ',')
-    parts = partsSplit.join('.')
-  } else {
-    parts = addThousandSeparator(partsString, ',')
-  }
-
-  // const amount = Number(partsString)
-
-  amountInput.value = parts
+  await fetchTableData(currentPage.value, perPage.value)
 }
 
 const markItemSelected = (item: Payment) => {
   const updatedItem = { ...item, _selected: !item._selected }
   // console.log({ item })
-  const updatedTableData = paidTableData.value.map((tableItem) => {
+  const updatedTableData = tableData.value.map((tableItem) => {
     if (tableItem.id === updatedItem.id) {
       return updatedItem
     }
@@ -184,394 +151,127 @@ const markItemSelected = (item: Payment) => {
 
   setSelectedPayments(marked)
 
-  paidTableData.value = updatedTableData
+  tableData.value = updatedTableData
 }
 
-onMounted(() => {
-  fetchPaidTableData()
-})
+const handlePaymentStatusChange = (payment_status: string) => {
+  selectedPaymentStatus.value = payment_status
 
-watch(perPage, async (newPerPage: number) => {
-  await fetchPaidTableData(currentPage.value, newPerPage)
-})
+  tableData.value = tableDataCopy.value.filter((row) => {
+    const paymentStatusMatch =
+      selectedPaymentStatus.value === 'all'
+        ? true
+        : convertDatesToPaymentStatus(row.payment_expected_at, row.payment_made_at) ===
+          selectedPaymentStatus.value
+  })
+}
 
-watch([searchInput, perPage], async ([newSearchInput]) => {
-  const search = newSearchInput.toLowerCase()
+const handleUserStatusChange = (user_status: string) => {
+  selectedUserStatus.value = user_status
 
-  // console.log({ search })
-  //     const amountMatch = row.amount >= amountNumber
-  if (search) {
-    paidTableData.value = paidTableDataCopy.value.filter((row) => {
-      return (
-        row.user.name.toLowerCase().includes(search) ||
-        row.user.email.toLowerCase().includes(search)
-      )
-    })
-  } else {
-    paidTableData.value = paidTableDataCopy.value
-  }
-})
+  tableData.value = tableDataCopy.value.filter((row) => {
+    const userStatusMatch =
+      selectedUserStatus.value === 'all'
+        ? true
+        : row.user.status.toLowerCase() === user_status?.toLowerCase()
 
-watch(amountInput, async () => {
-  const amountValue = amountInput.value
+    return userStatusMatch
+  })
+}
+
+const handleAmountInput = (amount_input: string) => {
+  amountInput.value = amount_input
+  const amountValue = amount_input
   const amountCleaned = amountValue.replace(/,/g, '')
   const amountNumber = Number(amountCleaned)
-  // console.log({ amountNumber })
 
   if (amountNumber >= 0) {
-    paidTableData.value = paidTableDataCopy.value.filter((row) => {
+    tableData.value = tableDataCopy.value.filter((row) => {
       return row.amount.toString().startsWith(amountCleaned) || row.amount >= amountNumber
     })
   } else {
-    paidTableData.value = paidTableDataCopy.value
+    tableData.value = tableDataCopy.value
   }
+}
+
+const handleSearchInput = (search_input: string) => {
+  console.log({ search_input })
+  searchInput.value = search_input
+
+  if (!!search_input) {
+    tableData.value = tableDataCopy.value.filter((row) => {
+      return (
+        row.user.name.toLowerCase().includes(search_input.toLowerCase()) ||
+        row.user.email.toLowerCase().includes(search_input.toLowerCase())
+      )
+    })
+  } else {
+    tableData.value = tableDataCopy.value
+  }
+}
+
+onMounted(() => {
+  fetchTableData()
 })
 
-watch(
-  [selectedPaymentStatus, selectedUserStatus],
-  async () => {
-    paidTableData.value = paidTableDataCopy.value.filter((row) => {
-      const userStatusMatch =
-        selectedUserStatus.value === 'all'
-          ? true
-          : row.user.status.toLowerCase() === selectedUserStatus.value?.toLowerCase()
-      // const paymentStatusMatch =
-      //   selectedPaymentStatus.value === 'all'
-      //     ? true
-      //     : convertDatesToPaymentStatus(row.payment_expected_at, row.payment_made_at) ===
-      //       selectedPaymentStatus.value
-
-      return userStatusMatch
-    })
-  },
-  {
-    deep: true
-  }
-)
+watch(perPage, async (newPerPage: number) => {
+  await fetchTableData(currentPage.value, newPerPage)
+})
 </script>
 
 <template>
   <section class="bg-white w-full rounded-2xl mt-8 flex flex-col justify-between">
-    <section class="px-4 border-b border-gray-200 flex flex-col items-center gap-2">
-      <main class="flex items-center justify-end pt-6 pb-4 w-full">
-        <button
-          class="bg-apex-light-white rounded-xl p-4 border border-apex-grey-2 flex items-center gap-2 justify-between"
-          @click="toggleFilters"
-        >
-          <span class="text-apex-green w-6 h-6">
-            <IconFilterVue />
-          </span>
-          <span class="text-apex-green">Filter</span>
-        </button>
-      </main>
-
-      <section class="grid grid-cols-4 w-full px-4 py-6 gap-4" v-if="showFilters">
-        <div class="flex flex-col items-start gap-2">
-          <label for="user_name" class="text-apex-black font-bold text-base">Name</label>
-          <div class="w-full rounded-xl">
-            <input
-              type="text"
-              id="user_name"
-              name="name"
-              placeholder="name"
-              v-model="searchInput"
-              class="w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
-            />
-          </div>
-        </div>
-        <div class="flex flex-col items-start gap-2">
-          <label for="amount" class="text-apex-black font-bold text-base">Amount</label>
-          <div class="w-full rounded-xl">
-            <input
-              type="text"
-              id="amount"
-              name="amount"
-              placeholder="1,000"
-              :value="amountInput"
-              @keydown="handleDisableLettersAndMultipleDecimal"
-              @input="handleAmountChange"
-              class="w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
-            />
-          </div>
-        </div>
-        <!-- <div class="flex flex-col items-start gap-2 w-full">
-          <Listbox
-            as="div"
-            v-model="selectedAmountFilter"
-            v-slot="{ open }"
-            class="w-full flex justify-between flex-col items-start gap-2"
-          >
-            <ListboxLabel class="block leading-6 text-apex-black font-bold text-base">
-              Amount</ListboxLabel
-            >
-            <div class="relative w-full">
-              <ListboxButton
-                class="relative cursor-pointer py-4 pl-4 pr-10 text-left shadow-sm sm:text-sm sm:leading-6 w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
-              >
-                <span
-                  class="block truncate text-base font-medium text-apex-content-header capitalize"
-                  >{{ selectedAmountFilter?.label }}&nbsp;</span
-                >
-
-                <span
-                  class="pointer-events-none absolute inset-y-0 flex items-center origin-center right-2 transition-transform duration-150 ease-out rotate-0"
-                  :class="{ 'rotate-180': open, 'rotate-0': !open }"
-                >
-                  <IconChevronUpDown class="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </span>
-              </ListboxButton>
-
-              <transition
-                leave-active-class="transition ease-in duration-100"
-                leave-from-class="opacity-100"
-                leave-to-class="opacity-0"
-              >
-                <ListboxOptions
-                  class="absolute z-10 mt-1 w-full overflow-auto rounded-md bg-white text-base shadow-lg focus:outline-none p-2 h-fit styled-scroll"
-                >
-                  <ListboxOption
-                    as="template"
-                    v-for="amount_filter in AMOUNT_FILTERS"
-                    :key="amount_filter.value"
-                    :value="amount_filter"
-                    v-slot="{ active, selected }"
-                  >
-                    <li
-                      :class="[
-                        active ? 'bg-[#F9FAFB]' : 'bg-transparent',
-                        'relative cursor-pointer select-none pl-2 pr-4 py-4 text-base text-apex-black rounded-xl'
-                      ]"
-                    >
-                      <div class="flex items-start gap-1.5 w-full">
-                        <span
-                          class="inline-block h-2 w-2 flex-shrink-0 rounded-full"
-                          :class="{
-                            'bg-apex-green': amount_filter.value === 'active',
-                            'bg-apex-orange': amount_filter.value === 'inactive'
-                          }"
-                          aria-hidden="true"
-                        />
-                        <span
-                          class="block truncate"
-                          :class="{
-                            'text-apex-green': amount_filter.value === 'active',
-                            'text-apex-orange': amount_filter.value === 'inactive',
-                            'font-semibold': selected,
-                            'font-normal': !selected
-                          }"
-                        >
-                          {{ amount_filter.label }}
-                        </span>
-                      </div>
-                    </li>
-                  </ListboxOption>
-                </ListboxOptions>
-              </transition>
-            </div>
-          </Listbox>
-        </div> -->
-        <div class="flex flex-col items-start gap-2 w-full">
-          <Listbox
-            as="div"
-            v-model="selectedUserStatus"
-            v-slot="{ open }"
-            class="w-full flex justify-between flex-col items-start gap-2"
-          >
-            <ListboxLabel class="block leading-6 text-apex-black font-bold text-base">
-              User's&nbsp;Status</ListboxLabel
-            >
-            <div class="relative w-full">
-              <ListboxButton
-                class="relative cursor-pointer py-4 pl-4 pr-10 text-left shadow-sm sm:text-sm sm:leading-6 w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
-              >
-                <span
-                  class="block truncate text-base font-medium text-apex-content-header capitalize"
-                  >{{ selectedUserStatus }}&nbsp;</span
-                >
-
-                <span
-                  class="pointer-events-none absolute inset-y-0 flex items-center origin-center right-2 transition-transform duration-150 ease-out rotate-0"
-                  :class="{ 'rotate-180': open, 'rotate-0': !open }"
-                >
-                  <IconChevronUpDown class="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </span>
-              </ListboxButton>
-
-              <transition
-                leave-active-class="transition ease-in duration-100"
-                leave-from-class="opacity-100"
-                leave-to-class="opacity-0"
-              >
-                <ListboxOptions
-                  class="absolute z-10 mt-1 w-fit sm:w-full overflow-auto rounded-md bg-white text-base shadow-lg focus:outline-none sm:text-sm p-2 h-fit styled-scroll flex flex-col items-start"
-                >
-                  <!-- :style="{ height: pxToRem(224) }" -->
-                  <ListboxOption
-                    as="template"
-                    v-for="user_status in USER_STATUSES"
-                    :key="user_status.value"
-                    :value="user_status.value"
-                    v-slot="{ active, selected }"
-                  >
-                    <li
-                      :class="[
-                        active ? 'bg-[#F9FAFB]' : 'bg-transparent',
-                        'relative cursor-pointer select-none sm:pl-2 pr-4 py-4 text-base text-apex-black rounded-xl w-full'
-                      ]"
-                    >
-                      <div class="flex items-center justify-start gap-1.5 w-full">
-                        <span
-                          class="inline-block h-2 w-2 flex-shrink-0 rounded-full"
-                          :class="{
-                            'bg-apex-green ml-2 sm:ml-4': user_status.value === 'active',
-                            'bg-apex-orange ml-2 sm:ml-4': user_status.value === 'inactive'
-                          }"
-                          aria-hidden="true"
-                        />
-                        <span
-                          class="block truncate"
-                          :class="{
-                            'text-apex-green': user_status.value === 'active',
-                            'text-apex-orange': user_status.value === 'inactive',
-                            'font-semibold': selected,
-                            'font-normal': !selected
-                          }"
-                        >
-                          {{ user_status.label }}
-                        </span>
-                      </div>
-                    </li>
-                  </ListboxOption>
-                </ListboxOptions>
-              </transition>
-            </div>
-          </Listbox>
-        </div>
-        <div class="flex flex-col items-start gap-2 w-full">
-          <Listbox
-            as="div"
-            v-model="selectedPaymentStatus"
-            v-slot="{ open }"
-            class="w-full flex justify-between flex-col items-start gap-2"
-          >
-            <ListboxLabel class="block leading-6 text-apex-black font-bold text-base"
-              >Payment&nbsp;Status</ListboxLabel
-            >
-            <div class="relative w-full">
-              <ListboxButton
-                class="relative cursor-pointer py-4 pl-4 pr-10 text-left shadow-sm sm:text-sm sm:leading-6 w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
-              >
-                <span
-                  class="block truncate text-base font-medium text-apex-content-header capitalize"
-                  >{{ selectedPaymentStatus }}&nbsp;</span
-                >
-
-                <span
-                  class="pointer-events-none absolute inset-y-0 flex items-center origin-center right-2 transition-transform duration-150 ease-out rotate-0"
-                  :class="{ 'rotate-180': open, 'rotate-0': !open }"
-                >
-                  <IconChevronUpDown class="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </span>
-              </ListboxButton>
-
-              <transition
-                leave-active-class="transition ease-in duration-100"
-                leave-from-class="opacity-100"
-                leave-to-class="opacity-0"
-              >
-                <ListboxOptions
-                  class="absolute z-10 mt-1 w-fit sm:w-full overflow-auto rounded-md bg-white text-base shadow-lg focus:outline-none sm:text-sm p-2 h-fit styled-scroll"
-                >
-                  <!-- :style="{ height: pxToRem(224) }" -->
-                  <ListboxOption
-                    as="template"
-                    v-for="payment_status in PAYMENT_STATUSES"
-                    :key="payment_status.value"
-                    :value="payment_status.value"
-                    v-slot="{ active, selected }"
-                  >
-                    <li
-                      :class="[
-                        active ? 'bg-[#F9FAFB]' : 'bg-transparent',
-                        'relative cursor-pointer select-none pl-2 pr-4 py-4 text-base text-apex-black rounded-xl'
-                      ]"
-                    >
-                      <div class="flex items-center gap-1.5 w-full">
-                        <span
-                          class="inline-block h-2 w-2 flex-shrink-0 rounded-full"
-                          :class="{
-                            'bg-apex-unpaid ml-4': payment_status.value === 'unpaid',
-                            'bg-apex-paid ml-4': payment_status.value === 'paid',
-                            'bg-apex-overdue ml-4': payment_status.value === 'overdue'
-                          }"
-                          aria-hidden="true"
-                        />
-                        <span
-                          class="block truncate"
-                          :class="{
-                            'text-apex-unpaid': payment_status.value === 'unpaid',
-                            'text-apex-paid': payment_status.value === 'paid',
-                            'text-apex-overdue': payment_status.value === 'overdue',
-                            'font-semibold': selected,
-                            'font-normal': !selected
-                          }"
-                        >
-                          {{ payment_status.label }}
-                        </span>
-                      </div>
-                    </li>
-                  </ListboxOption>
-                </ListboxOptions>
-              </transition>
-            </div>
-          </Listbox>
-        </div>
-      </section>
-    </section>
+    <TableFilter
+      @on_payment_status_change="handlePaymentStatusChange"
+      :selected-payment-status="selectedPaymentStatus"
+      :selected-user-status="selectedUserStatus"
+      @on_user_status_change="handleUserStatusChange"
+      :amount-input="amountInput"
+      @on_amount_input="handleAmountInput"
+      :search-input="searchInput"
+      @on_name_input="handleSearchInput"
+    />
 
     <section class="my-4 flow-root">
       <div class="overflow-auto">
         <div class="inline-block min-w-full py-2 align-middle">
-          <table class="min-w-full divide-y divide-gray-300">
+          <table class="min-w-full divide-y divide-apex-grey-2 border-y border-y-apex-grey-2">
             <thead>
-              <tr>
+              <tr class="">
                 <th
                   scope="col"
-                  class="py-1.5 pl-16 pr-3 text-left text-base font-medium text-apex-table-header"
+                  class="py-6 pl-16 pr-3 text-left text-base font-medium text-apex-table-header"
                 >
                   Name
                 </th>
                 <th
                   scope="col"
-                  class="px-3 py-1.5 text-left text-base font-medium text-apex-table-header"
+                  class="px-3 py-6 text-left text-base font-medium text-apex-table-header"
                 >
                   User&nbsp;Status
                 </th>
                 <th
                   scope="col"
-                  class="px-3 py-1.5 text-left text-base font-medium text-apex-table-header"
+                  class="px-3 py-6 text-left text-base font-medium text-apex-table-header"
                 >
                   Payment&nbsp;Status
                 </th>
                 <th
                   scope="col"
-                  class="px-3 py-1.5 text-left text-base font-medium text-apex-table-header"
+                  class="px-3 py-6 text-left text-base font-medium text-apex-table-header"
                 >
                   Amount
                 </th>
-                <th scope="col" class="relative py-1.5 pl-3 pr-8">
+                <th scope="col" class="relative py-6 pl-3 pr-8">
                   <span class="sr-only">Action</span>
                 </th>
               </tr>
             </thead>
-            <TableSkeleton v-if="isLoadingPaidTable" />
-            <tbody
-              class="divide-y divide-apex-grey-2"
-              v-else-if="!isLoadingPaidTable && !!paidTableData"
-            >
-              <template v-if="paidTableData.length > 0">
+            <TableSkeleton v-if="isLoadingTable" />
+            <tbody class="divide-y divide-apex-grey-2" v-else-if="!isLoadingTable && !!tableData">
+              <template v-if="tableData.length > 0">
                 <tr
-                  v-for="transaction in paidTableData"
+                  v-for="transaction in tableData"
                   :key="transaction.id"
                   class="hover:bg-apex-table-highlight last-of-type:border-b last-of-type:border-apex-grey-2"
                 >
@@ -708,10 +408,9 @@ watch(
     </section>
 
     <main
-      class="w-full flex items-center justify-between border-t border-gray-200 pb-6 pt-8 pl-8 pr-4"
+      class="w-full flex items-center justify-between pb-6 pt-8 pl-8 pr-4"
       v-if="
-        (!isLoadingPaidTable && paidTableData.length > 0) ||
-        (!isLoadingPaidTable && currentPage <= totalPages)
+        (!isLoadingTable && tableData.length > 0) || (!isLoadingTable && currentPage <= totalPages)
       "
     >
       <!-- <Pagination :total-items="total" /> -->

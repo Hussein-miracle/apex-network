@@ -51,8 +51,8 @@ const tableData = ref<{ id: number }[]>([
       </td>
       <td class="whitespace-nowrap px-3 py-2">
         <div class="flex flex-col gap-2 items-start">
-          <div class="animate-pulse w-12 h-6 bg-gray-200 rounded-md">&nbsp;</div>
-          <div class="animate-pulse w-12 h-6 bg-gray-200 rounded-md">&nbsp;</div>
+          <div class="animate-pulse w-16 h-5 bg-gray-200 rounded-md">&nbsp;</div>
+          <div class="animate-pulse w-12 h-5 bg-gray-200 rounded-md">&nbsp;</div>
         </div>
       </td>
       <td class="relative whitespace-nowrap py-2 pl-3 pr-8 text-right text-sm font-medium">

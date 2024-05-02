@@ -24,12 +24,16 @@ export interface MakePaymentResponse {
   data: Omit<Payment, 'user'>;
 }
 
-export type PaymentStatusItem = {
+export type StatusItem = {
   value: string;
   label: string;
 };
+export type PaymentStatusItem = {
+  value: PaymentStatus & string;
+  label: string;
+};
 export type UserStatusItem = {
-  value: UserStatus | 'all';
+  value: UserStatus & string;
   label: string;
 };
 export interface Payment {
