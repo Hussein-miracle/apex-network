@@ -22,7 +22,7 @@ const props = defineProps({
   perPage: {
     type: Number as PropType<number>,
     required: false,
-    default: 10
+    default: 6
   },
   currentPage: {
     type: Number as PropType<number>,
@@ -36,12 +36,7 @@ const props = defineProps({
   maxPagesShown: {
     type: Number as PropType<number>,
     required: false,
-    default: 5
-  },
-  onPerPageChange: {
-    type: Function as PropType<(perPage: number) => void>,
-    required: !true,
-    default: (p: number) => {}
+    default: 10
   },
   handleBreakpoint: {
     type: Function as PropType<() => void>,
