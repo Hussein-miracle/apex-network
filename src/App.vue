@@ -35,7 +35,7 @@ const handlePayDues = async () => {
     if (response.message === 'success') {
       successToast('Payment successful')
     }
-    // FIXME: this could easily have been handle with tanstack query,which won't require a page reload
+    // FIXME: this could easily have been handled with tanstack query,which won't require a page reload
     window.location.reload()
     // successToast()
   } catch (error: any) {
@@ -52,6 +52,16 @@ watch(tab, (newTab) => {
   }
   // tab.current = tab.href === router.currentRoute.value.path
 })
+
+const handleTabChange = (event: Event) => {
+  // console.log({ event })
+  const currentTarget = event.target as HTMLSelectElement
+  const newTab = currentTarget.value
+  if (!!newTab && newTab !== router.currentRoute.value.path) {
+    tab.value = newTab
+    router.push(newTab)
+  }
+}
 </script>
 
 <template>
@@ -81,7 +91,7 @@ watch(tab, (newTab) => {
             <select
               id="tabs"
               name="tabs"
-              v-model="tab"
+              @change="handleTabChange"
               class="block w-full rounded-md border border-apex-grey-2 py-2 pl-3 pr-10 text-base focus:border-apex-green focus:outline-none focus:ring-apex-green sm:text-sm"
             >
               <option v-for="tab in tabs" :key="tab.name" :selected="tab.current" :value="tab.href">

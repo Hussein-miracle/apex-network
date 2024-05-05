@@ -38,20 +38,12 @@ const props = defineProps({
     required: false,
     default: 10
   },
-  handleBreakpoint: {
-    type: Function as PropType<() => void>,
-    required: !true
-  }
 })
 
 const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
 
 const selectedPage = ref<number>(props.currentPage)
 const selectedPerPage = ref<number>(props.perPage)
-
-const page = computed(() => {
-  return selectedPage.value
-})
 
 const hasNextPage = computed(() => {
   return selectedPage.value !== totalPages.value
@@ -85,6 +77,8 @@ const handleNextPage = () => {
 }
 
 const handleBreakpoint = () => {
+  if (selectedPage.value + Math.ceil(props.maxPagesShown / 2) >= totalPages.value) return
+
   selectedPage.value = selectedPage.value + Math.ceil(props.maxPagesShown / 2)
   emit(PAGINATION_EMITS.ON_CURRENT_PAGE_CHANGE, selectedPage.value)
 }

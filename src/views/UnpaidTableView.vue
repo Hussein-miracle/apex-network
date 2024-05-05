@@ -43,13 +43,13 @@ const fetchTableData = async (page: number = 1, per_page: number = 6, state: Sta
       state,
       perPage: per_page ?? 6
     })
-    // console.log({ tableDataLog: data })
     hasNextPage.value = !!data.next_page_url
     hasPrevPage.value = !!data.prev_page_url
     totalItems.value = data.total
     resetFilters()
     tableData.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
     tableDataCopy.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
+    console.log({ tableDataLogUnpaid: tableDataCopy.value });
   } catch (err: any) {
     console.error(err)
     errorToast(err?.message ?? 'An error occurred while fetching unpaid payments data')

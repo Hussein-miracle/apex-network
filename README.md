@@ -6,7 +6,7 @@
 
 - The utility function converting dates to `PaymentStatus` seems a little bit buggy,working for `unpaid` & `overdue` but not for paid.
 - The approach of using url to manage the filter page as route was to improve UX as opposed to using tab,i know using tabs component would make the code more re-usable to some extent.
-- But in my experience with building web app,too much re-usablity can lead to complexity or friction when adding new features in a codebase.
+- But in my experience with building web apps,too much re-usablity can lead to complexity or friction when adding new features in a codebase.
 
 This template should help get you started developing with Vue 3 in Vite.
 

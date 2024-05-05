@@ -116,10 +116,31 @@ const props = defineProps({
                 <td class="whitespace-nowrap px-3 py-2 text-sm">
                   <div class="flex flex-col gap-2 items-start">
                     <PaymentStatus :payment_status="transaction._payment_status!" />
-                    <div class="text-base font-medium text-apex-content-body">
+                    <div
+                      class="text-base font-medium text-apex-content-body"
+                      v-if="transaction._payment_status === 'paid'"
+                    >
                       Paid On:
                       <span class="text-base font-medium text-apex-content-body">{{
                         convertIsoDateToFormattedDate(transaction?.payment_made_at)
+                      }}</span>
+                    </div>
+                    <div
+                      class="text-base font-medium text-apex-content-body"
+                      v-else-if="transaction._payment_status === 'unpaid'"
+                    >
+                      Dues On:
+                      <span class="text-base font-medium text-apex-content-body">{{
+                        convertIsoDateToFormattedDate(transaction?.payment_expected_at)
+                      }}</span>
+                    </div>
+                    <div
+                      class="text-base font-medium text-apex-content-body"
+                      v-else-if="transaction._payment_status === 'overdue'"
+                    >
+                      Dued On:
+                      <span class="text-base font-medium text-apex-content-body">{{
+                        convertIsoDateToFormattedDate(transaction?.payment_expected_at)
                       }}</span>
                     </div>
                   </div>
@@ -169,12 +190,12 @@ const props = defineProps({
                         >
                           <div class="flex flex-col items-center text-start w-full">
                             <div
-                              class="text-apex-content-body hover:bg-apex-light-green transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
+                              class="text-apex-content-body font-medium text-sm hover:bg-apex-light-green transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
                             >
                               Edit
                             </div>
                             <div
-                              class="text-apex-content-body hover:bg-apex-light-green transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
+                              class="text-apex-content-body font-medium text-sm hover:bg-apex-light-green transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
                             >
                               View&nbsp;Profile
                             </div>
@@ -182,7 +203,7 @@ const props = defineProps({
                           <div class="bg-accent-blue-50 h-[1px] w-full" />
                           <div class="text-start w-full">
                             <div
-                              class="text-apex-danger hover:font-semibold hover:bg-apex-black transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
+                              class="text-apex-danger font-medium text-sm hover:font-semibold hover:bg-apex-black transition-colors ease-in-out duration-100 w-full px-2 py-1 rounded cursor-pointer"
                             >
                               Delete
                             </div>
