@@ -13,14 +13,12 @@ export const getPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: strin
   const expectedDate = new Date(new Date(paymentExpectedAt).toISOString()).getTime();
   let madeDate: number | null = null;
 
-  if (!!paymentMadeAt) {
-    madeDate = new Date(paymentMadeAt).getTime();
-  }
-
-  if (currentDate > expectedDate && !!paymentMadeAt) return 'overdue';
+  if (currentDate > expectedDate) return 'overdue';
 
 
-  if (!(currentDate > expectedDate) && !madeDate) return 'unpaid';
+  if (!paymentMadeAt) return 'unpaid';
+
+  // if (!(currentDate > expectedDate) && !madeDate) return 'unpaid';
 
 
   return 'paid'
@@ -80,7 +78,7 @@ export const formatPaymentTableData = (data: Payment[]) => {
       ...item,
       _selected: false,
       _payment_status: convertDatesToPaymentStatus(item?.payment_expected_at, item?.payment_made_at),
-      _ps: getPaymentStatus(item.payment_expected_at, item.payment_made_at),
+      // _ps: getPaymentStatus(item.payment_expected_at, item.payment_made_at),
     }
   })
 }

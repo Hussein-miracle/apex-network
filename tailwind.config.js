@@ -23,6 +23,7 @@ module.exports = {
         'apex-table-header': '#718096',
         'apex-table-highlight': 'rgba(249, 250, 251, 1)',
         'apex-table-checkmark': '#CBD5E0',
+        'apex-filter-icon': 'rgba(160, 174, 192, 1)',
 
         'apex-content': {
           body: 'rgba(56, 58, 71, 1)',

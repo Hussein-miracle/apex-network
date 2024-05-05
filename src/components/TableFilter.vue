@@ -98,7 +98,7 @@ const handleAmountChange = (e: Event) => {
         <span class="text-apex-green w-6 h-6">
           <IconFilterVue />
         </span>
-        <span class="text-apex-green">Filter</span>
+        <span class="text-apex-green text-base font-medium">Filter</span>
       </button>
     </main>
 
@@ -231,7 +231,7 @@ const handleAmountChange = (e: Event) => {
                 class="pointer-events-none absolute inset-y-0 flex items-center origin-center right-2 transition-transform duration-150 ease-out rotate-0"
                 :class="{ 'rotate-180': open, 'rotate-0': !open }"
               >
-                <IconChevronUpDown class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                <IconChevronUpDown class="h-5 w-5 text-apex-filter-icon" aria-hidden="true" />
               </span>
             </ListboxButton>
 
@@ -307,7 +307,7 @@ const handleAmountChange = (e: Event) => {
                 class="pointer-events-none absolute inset-y-0 flex items-center origin-center right-2 transition-transform duration-150 ease-out rotate-0"
                 :class="{ 'rotate-180': open, 'rotate-0': !open }"
               >
-                <IconChevronUpDown class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                <IconChevronUpDown class="h-5 w-5 text-apex-filter-icon" aria-hidden="true" />
               </span>
             </ListboxButton>
 
