@@ -25,7 +25,7 @@ export const getPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: strin
 }
 
 export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMadeAt: string | null): PaymentStatus => {
-  let status: PaymentStatus;
+  // let status: PaymentStatus;
 
   // console.log('paymentExpectedAt', paymentExpectedAt);
   // console.log('paymentExpectedAt', paymentExpectedAt);
@@ -33,7 +33,7 @@ export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMa
   //console.log('paymentMadeAt', paymentMadeAt);
   const currentDate = new Date().getTime();
   const expectedDate = new Date(new Date(paymentExpectedAt).toISOString()).getTime();
-  let madeDate: number | null = null;
+  // let madeDate: number | null = null;
 
 
   // const convertDatesToPaymentStatus = (expected: string, made: string) => {
@@ -53,21 +53,22 @@ export const convertDatesToPaymentStatus = (paymentExpectedAt: string, paymentMa
 
 
   if (!!paymentMadeAt) {
-    madeDate = new Date(paymentMadeAt).getTime();
+    // madeDate = new Date(paymentMadeAt).getTime();
+    return 'paid'
   }
   // const madeDate = new Date(paymentMadeAt).getTime();
 
 
 
-  if ((!!madeDate && madeDate > expectedDate)) {
-    return 'overdue';
-  }
+  // if ((!!madeDate && madeDate > expectedDate)) {
+  //   return 'overdue';
+  // }
 
 
 
-  if (!madeDate && currentDate <= expectedDate) return 'unpaid';
+  if (currentDate <= expectedDate) return 'unpaid';
 
-  if (!!madeDate && madeDate <= expectedDate) return 'paid';
+  // if (!!madeDate && madeDate <= expectedDate) return 'paid';
 
   return 'overdue';
 }
