@@ -49,7 +49,7 @@ const fetchTableData = async (page: number = 1, per_page: number = 6, state: Sta
     resetFilters()
     tableData.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
     tableDataCopy.value = formatPaymentTableData((data.data as unknown as Payment[]) ?? [])
-    console.log({ tableDataLogPaid: tableDataCopy.value })
+    // console.log({ tableDataLogPaid: tableDataCopy.value })
   } catch (err: any) {
     console.error(err)
     errorToast(err?.message ?? 'An error occurred while fetching paid payments data')

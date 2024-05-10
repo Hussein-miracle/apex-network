@@ -36,7 +36,7 @@ const props = defineProps({
   maxPagesShown: {
     type: Number as PropType<number>,
     required: false,
-    default: 10
+    default: 20
   }
 })
 
