@@ -36,8 +36,8 @@ const props = defineProps({
   maxPagesShown: {
     type: Number as PropType<number>,
     required: false,
-    default: 10
-  },
+    default: 20
+  }
 })
 
 const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
@@ -98,7 +98,7 @@ watch(selectedPerPage, (newValue: number) => {
 </script>
 
 <template>
-  <div class="flex items-center justify-between w-full">
+  <div class="flex items-center justify-between w-full isolate">
     <div class="flex flex-1 justify-between sm:hidden">
       <button
         type="button"
@@ -145,7 +145,7 @@ watch(selectedPerPage, (newValue: number) => {
                 leave-to-class="opacity-0"
               >
                 <ListboxOptions
-                  class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
+                  class="absolute bottom-8 mb-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg focus:outline-none sm:text-sm z-10"
                 >
                   <ListboxOption
                     v-slot="{ active, selected }"
@@ -192,11 +192,13 @@ watch(selectedPerPage, (newValue: number) => {
           >
             {{ page }}
           </button>
-          <span
+          <button
+            :disabled="selectedPage + Math.ceil(props.maxPagesShown / 2) >= totalPages"
             @click="handleBreakpoint"
             class="relative cursor-pointer inline-flex items-center px-4 py-2 text-sm font-semibold hover:bg-apex-light-green hover:text-apex-green w-10 h-10 rounded-xl"
-            >...</span
           >
+            ...
+          </button>
 
           <button
             type="button"

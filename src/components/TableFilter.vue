@@ -112,7 +112,7 @@ const handleAmountChange = (e: Event) => {
             name="name"
             v-model="searchInputProxy"
             placeholder="name"
-            class="w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
+            class="w-full border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:ring-2 focus:ring-apex-green"
           />
           <!-- v-model="searchInput" -->
         </div>
@@ -128,7 +128,7 @@ const handleAmountChange = (e: Event) => {
             :value="amountInputProxy"
             @keydown="handleDisableLettersAndMultipleDecimal"
             @input="handleAmountChange"
-            class="w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
+            class="w-full border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-2 focus:ring-apex-green"
           />
         </div>
       </div>
@@ -221,7 +221,7 @@ const handleAmountChange = (e: Event) => {
           <!-- v-model="selectedUserStatus" -->
           <div class="relative w-full">
             <ListboxButton
-              class="relative cursor-pointer py-4 pl-4 pr-10 text-left shadow-sm sm:text-sm sm:leading-6 w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
+              class="relative cursor-pointer py-4 pl-4 pr-10 text-left shadow-sm sm:text-sm sm:leading-6 w-full border border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
             >
               <span class="block truncate text-base font-medium text-apex-content-header capitalize"
                 >{{ selectedUserStatus }}&nbsp;</span
@@ -297,7 +297,7 @@ const handleAmountChange = (e: Event) => {
           >
           <div class="relative w-full">
             <ListboxButton
-              class="relative cursor-pointer py-4 pl-4 pr-10 text-left shadow-sm sm:text-sm sm:leading-6 w-full border bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
+              class="relative cursor-pointer py-4 pl-4 pr-10 text-left shadow-sm sm:text-sm sm:leading-6 w-full border border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
             >
               <span class="block truncate text-base font-medium text-apex-content-header capitalize"
                 >{{ selectedPaymentStatusProxy }}&nbsp;</span
