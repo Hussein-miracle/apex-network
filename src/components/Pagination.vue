@@ -37,7 +37,7 @@ const props = defineProps({
     type: Number as PropType<number>,
     required: false,
     default: 10
-  },
+  }
 })
 
 const totalPages = computed(() => Math.ceil(props.totalItems / props.perPage))
@@ -192,11 +192,13 @@ watch(selectedPerPage, (newValue: number) => {
           >
             {{ page }}
           </button>
-          <span
+          <button
+            :disabled="selectedPage + Math.ceil(props.maxPagesShown / 2) >= totalPages"
             @click="handleBreakpoint"
             class="relative cursor-pointer inline-flex items-center px-4 py-2 text-sm font-semibold hover:bg-apex-light-green hover:text-apex-green w-10 h-10 rounded-xl"
-            >...</span
           >
+            ...
+          </button>
 
           <button
             type="button"
