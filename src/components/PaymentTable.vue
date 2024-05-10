@@ -41,8 +41,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <section class="my-4 flow-root z-50">
-    <!-- <div class="overflow-x-auto"> -->
+  <section class="my-4 flow-root isolate">
+    <!-- <div class="overflow-auto"> -->
     <div class="inline-block min-w-full py-2 align-middle">
       <table class="min-w-full divide-y divide-apex-grey-2 border-y border-y-apex-grey-2">
         <thead>

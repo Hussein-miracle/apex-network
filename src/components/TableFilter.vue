@@ -89,7 +89,7 @@ const handleAmountChange = (e: Event) => {
 </script>
 
 <template>
-  <section class="px-4 flex flex-col items-center gap-2 ">
+  <section class="px-4 flex flex-col items-center gap-2">
     <main class="flex items-center justify-end pt-6 pb-4 w-full">
       <button
         class="bg-apex-light-white rounded-xl p-4 border border-apex-grey-2 flex items-center gap-2 justify-between"
@@ -112,7 +112,7 @@ const handleAmountChange = (e: Event) => {
             name="name"
             v-model="searchInputProxy"
             placeholder="name"
-            class="w-full border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
+            class="w-full border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:ring-2 focus:ring-apex-green"
           />
           <!-- v-model="searchInput" -->
         </div>
@@ -128,7 +128,7 @@ const handleAmountChange = (e: Event) => {
             :value="amountInputProxy"
             @keydown="handleDisableLettersAndMultipleDecimal"
             @input="handleAmountChange"
-            class="w-full border border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-1 focus:ring-apex-green"
+            class="w-full border-transparent bg-apex-light-white rounded-md p-4 text-base text-apex-content-header placeholder:text-[#A0AEC0] outline-none focus:outline-none focus:border-apex-green focus:ring-2 focus:ring-apex-green"
           />
         </div>
       </div>
